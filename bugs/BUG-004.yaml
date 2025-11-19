@@ -1,0 +1,62 @@
+id: "BUG-004"
+title: "Secret key generated per boot prevents multi-instance sessions"
+status: "resolved"
+priority: "medium"
+severity: "moderate"
+created_date: "2025-11-16"
+updated_date: "2025-11-16"
+resolved_date: "2025-11-16"
+reporter: "GPT-5 Codex"
+assignee: "Unassigned"
+environment:
+  os: "macOS / Linux / Windows"
+  browser: "All browsers"
+  language_version: "Python 3.8+"
+  dependencies: []
+description: |
+  The Flask app sets `app.secret_key = os.urandom(24)` on every startup. Each instance
+  therefore emits a different key, making session cookies invalid across restarts and
+  impossible to share across multiple web workers. External partners expecting stable
+  sessions or SSO callbacks will see broken flows.
+steps_to_reproduce:
+  - "Step 1: Start the Flask server and establish a session (e.g., via AWS Lex widget)."
+  - "Step 2: Restart the server or scale to a second instance."
+  - "Step 3: Observe existing sessions are invalidated with `BadSignature` errors."
+expected_behavior: |
+  The secret key should be configured via environment or secret manager so that all
+  instances share the same value and restarts do not invalidate sessions.
+actual_behavior: |
+  Each server process generates a random secret, breaking sticky sessions and
+  horizontal scaling.
+affected_files:
+  - "src/web/app.py"
+affected_functions:
+  - "create_app()"
+code_snippet: |
+  app = Flask(__name__)
+  app.secret_key = os.urandom(24)
+error_message: |
+  `itsdangerous.exc.BadSignature: Signature b'...' does not match digest` when the key changes.
+root_cause: |
+  Secret key was hardcoded to generate random value on each startup.
+solution: |
+  Changed to read from FLASK_SECRET_KEY environment variable with fallback to random key.
+  Added warning when environment variable is not set to alert developers.
+fix_commit: null
+fix_pr: null
+test_coverage:
+  has_unit_test: false
+  has_integration_test: false
+  regression_test_added: false
+tags:
+  - "configuration"
+  - "scalability"
+related_bugs: []
+blocked_by: []
+blocks: []
+notes: |
+  Needs environment-driven configuration plus deployment runbook updates for partners.
+attachments:
+  screenshots: []
+  logs: []
+  recordings: []

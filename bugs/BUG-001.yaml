@@ -1,0 +1,71 @@
+id: "BUG-001"
+title: "Path Access via /api/compress allows arbitrary filesystem reads"
+status: "wont-fix"
+priority: "critical"
+severity: "critical"
+created_date: "2025-11-16"
+updated_date: "2025-11-16"
+resolved_date: null
+reporter: "GPT-5 Codex"
+assignee: "Unassigned"
+environment:
+  os: "macOS / Linux / Windows"
+  browser: "All browsers"
+  language_version: "Python 3.8+"
+  dependencies: []
+description: |
+  The `/api/compress` and `/api/estimate` endpoints accept an arbitrary `source_dir`
+  supplied by the client and expand it server-side without any sandboxing. A remote user
+  can point the service at sensitive directories such as `/etc` or the application
+  secrets folder, causing the backend to enumerate and process files that should never
+  be exposed. This makes the service unsafe for multi-tenant or hosted deployments.
+steps_to_reproduce:
+  - "Step 1: Send POST /api/estimate with JSON body {\"source_dir\": \"/etc\"}."
+  - "Step 2: Observe the API returns metadata about server files instead of rejecting the request."
+  - "Step 3: Repeat with /api/compress to trigger processing on arbitrary system paths."
+expected_behavior: |
+  The service should restrict processing to approved, tenant-scoped storage roots or
+  reject paths that escape the configured workspace.
+actual_behavior: |
+  Any absolute path that exists on the host is accepted, allowing remote enumeration
+  and processing of sensitive server data.
+affected_files:
+  - "src/web/app.py"
+affected_functions:
+  - "compress()"
+  - "estimate()"
+code_snippet: |
+  def compress():
+      """Start compression job."""
+      data = request.json
+      source_dir = data.get('source_dir')
+      ...
+      source_path = Path(source_dir).expanduser().resolve()
+      if not source_path.exists():
+          return jsonify({'error': f'Directory does not exist: {source_path}'})
+      ...
+      pipeline = CompressionPipeline(source_dir=str(source_dir), ...)
+error_message: |
+  No error is raised; the operation succeeds on sensitive paths.
+root_cause: null
+solution: null
+fix_commit: null
+fix_pr: null
+test_coverage:
+  has_unit_test: false
+  has_integration_test: false
+  regression_test_added: false
+tags:
+  - "security"
+  - "path-validation"
+related_bugs: []
+blocked_by: []
+blocks: []
+notes: |
+  Initial discovery during integration-readiness review for external partners.
+  Deferred as enterprise integration item - requires tenant-scoped storage architecture.
+  See docs/developer/INTEGRATION_BACKLOG.md IB-01 for future implementation.
+attachments:
+  screenshots: []
+  logs: []
+  recordings: []

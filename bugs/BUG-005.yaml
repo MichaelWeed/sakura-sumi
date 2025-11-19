@@ -1,0 +1,125 @@
+id: "BUG-005"
+title: "PDF generation fails on files with unescaped XML/HTML special characters"
+status: "resolved"
+priority: "critical"
+severity: "critical"
+
+created_date: "2025-01-16"
+updated_date: "2025-01-16"
+resolved_date: "2025-01-16"
+reporter: "system"
+assignee: "system"
+
+environment:
+  os: "macOS / Linux / Windows"
+  browser: "N/A"
+  language_version: "Python 3.8+"
+  dependencies:
+    - "reportlab"
+
+description: |
+  PDF generation was failing silently for most files when using smart concatenation.
+  The reportlab Paragraph parser uses XML-like markup and fails when encountering
+  unescaped special characters (<, >, &) in file content. This caused 99 out of 109
+  files to fail during PDF generation, resulting in only 5 small PDFs being created
+  instead of the expected 10 PDFs with all files.
+
+steps_to_reproduce:
+  - "Step 1: Run smart concatenation on a codebase with TypeScript/React files"
+  - "Step 2: Files containing JSX syntax (<Component />) or comparison operators (<, >)"
+  - "Step 3: PDF generation fails with parse error"
+
+expected_behavior: |
+  All files should be successfully converted to PDFs, with special characters properly
+  escaped for reportlab's XML parser.
+
+actual_behavior: |
+  PDF generation failed for 99/109 files (9.2% success rate) with error:
+  'paraparser: syntax error: parse ended with 1 unclosed tags\n para'
+  
+  Only 5 small PDFs were generated instead of 10 complete PDFs.
+
+affected_files:
+  - "src/compression/pdf_converter.py"
+
+affected_functions:
+  - "PDFConverter.concatenate_files_to_pdf()"
+  - "PDFConverter._generate_pdf()"
+
+code_snippet: |
+  # Before fix (line 317):
+  story.append(Paragraph(line.replace(' ', '&nbsp;'), code_style))
+  
+  # After fix:
+  # Preserve existing HTML entities
+  line = line.replace('&nbsp;', '__NBSP__').replace('&lt;', '__LT__')...
+  # Escape all remaining special characters
+  escaped_line = html.escape(line)
+  # Restore preserved entities
+  escaped_line = escaped_line.replace('__NBSP__', '&nbsp;')...
+  # Replace spaces with non-breaking spaces
+  escaped_line = escaped_line.replace(' ', '&nbsp;')
+  story.append(Paragraph(escaped_line, code_style))
+
+error_message: |
+  'paraparser: syntax error: parse ended with 1 unclosed tags\n para'
+
+resolution:
+  root_cause: |
+    reportlab's Paragraph parser uses XML-like markup. When file content contains
+    unescaped special characters (<, >, &), the parser attempts to interpret them
+    as XML tags and fails when tags are not properly closed or formatted.
+    
+    Code files naturally contain these characters (JSX syntax, comparison operators,
+    bitwise operators, etc.), so they must be escaped before being passed to Paragraph.
+  
+  solution: |
+    Added proper XML/HTML escaping in PDFConverter:
+    1. Preserve existing HTML entities (nbsp, lt, gt, amp) using placeholders
+    2. Escape all remaining special characters using html.escape()
+    3. Restore preserved entities
+    4. Replace spaces with &nbsp; for formatting
+    
+    Applied fix to both concatenate_files_to_pdf() and _generate_pdf() methods.
+  
+  fix_commit: null
+  fix_pr: null
+
+testing:
+  test_coverage:
+    has_unit_test: false
+    has_integration_test: true
+    regression_test_added: false
+
+metadata:
+  tags:
+    - "pdf-generation"
+    - "smart-concatenation"
+    - "reportlab"
+    - "xml-escaping"
+  related_bugs: []
+  blocked_by: []
+  blocks: []
+
+notes: |
+  This bug was discovered during testing of the smart concatenation feature.
+  Test case: '/path/to/test/codebase' (109 files, 12 directories)
+  
+  Before fix:
+  - Success rate: 9.2% (10/109 files)
+  - Generated PDFs: 5 (only small files succeeded)
+  
+  After fix:
+  - Success rate: 100% (109/109 files)
+  - Generated PDFs: 10 (all expected PDFs created)
+  
+  The fix ensures all code files can be successfully converted to PDFs regardless
+  of their content, making the smart concatenation feature fully functional.
+  
+  See docs/developer/SMART_CONCATENATION.md for full documentation.
+
+attachments:
+  screenshots: []
+  logs: []
+  recordings: []
+

@@ -1,0 +1,12 @@
+{
+  "deepseek_ocr": {
+    "compression_ratio": 10,
+    "accuracy": 0.97,
+    "throughput_pages_per_day": 200000,
+    "avg_processing_time_per_page_seconds": 0.005,
+    "text_to_vision_token_ratio": 0.1,
+    "model_version": "DeepSeek-OCR v2.0",
+    "description": "DeepSeek-OCR compression metrics and configuration"
+  }
+}
+

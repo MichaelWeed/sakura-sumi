@@ -1,0 +1,15 @@
+notes:
+  - date: "2025-01-17"
+    summary: "Prepared project for open source distribution: removed all system-specific paths and personal information, cleaned up documentation, updated examples to use generic paths."
+  - date: "2025-01-17"
+    summary: "Resolved BUG-008 (favicon), BUG-009 (Prompt Collector viewport), and BUG-010 (Job History buttons) during comprehensive end-to-end testing."
+  - date: "2025-01-16"
+    summary: "🌸 Sakura Sumi - Officially renamed OCR Compression Portal to 'Sakura Sumi' (a nod to the fading ink haiku). Updated all references throughout codebase with pink flower petal emoji (🌸) prefix."
+  - date: "2025-01-16"
+    summary: "Implemented Smart Concatenation system: intelligently groups source files into max 10 PDFs with prioritized roll-up strategy. Fixed critical PDF generation bug: XML/HTML escaping issue causing 99/109 files to fail. Added proper HTML entity escaping in PDFConverter, achieving 100% success rate. Created comprehensive documentation in docs/developer/SMART_CONCATENATION.md."
+  - date: "2025-11-16"
+    summary: "Fixed non-enterprise bugs: BUG-002 (GUI endpoints disabled in headless), BUG-004 (secret key from env). Deferred BUG-001 and BUG-003 as enterprise items."
+  - date: "2025-11-16"
+    summary: "Project structure: bugs/ at root, archive/ for historical files, notes.yaml for canonical notes."
+notes_files: []
+

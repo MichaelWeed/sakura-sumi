@@ -1,0 +1,71 @@
+id: "BUG-002"
+title: "Remote GUI helper endpoints trigger OS dialogs on the server"
+status: "resolved"
+priority: "high"
+severity: "major"
+created_date: "2025-11-16"
+updated_date: "2025-11-16"
+resolved_date: "2025-11-16"
+reporter: "GPT-5 Codex"
+assignee: "Unassigned"
+environment:
+  os: "macOS / Linux / Windows"
+  browser: "All browsers"
+  language_version: "Python 3.8+"
+  dependencies: []
+description: |
+  The `/api/browse-directory` and `/api/open-folder` endpoints attempt to launch native
+  GUI dialogs (`tkinter` file pickers and `xdg-open`/`open`) on the server. In a hosted
+  deployment this both fails (headless servers cannot show dialogs) and poses a
+  security risk because attackers can spam the endpoints to open arbitrary paths or
+  exhaust GUI resources on the host.
+steps_to_reproduce:
+  - "Step 1: Deploy the service headlessly (standard production setup)."
+  - "Step 2: POST to /api/browse-directory; the server tries to instantiate tkinter and fails."
+  - "Step 3: POST to /api/open-folder with {\"path\": \"/tmp\"}; the server runs `open`/`xdg-open` on the host."
+expected_behavior: |
+  Remote clients should receive an error indicating that GUI helpers are unavailable
+  in hosted mode, or the endpoints should be disabled entirely when the feature set is
+  not applicable.
+actual_behavior: |
+  The server attempts to open local OS dialogs and commands, causing failures in
+  production and inviting abuse.
+affected_files:
+  - "src/web/app.py"
+affected_functions:
+  - "browse_directory()"
+  - "open_folder()"
+code_snippet: |
+  @app.route('/api/open-folder', methods=['POST'])
+  def open_folder():
+      folder_path = Path(folder_path).expanduser().resolve()
+      ...
+      if system == 'Darwin':
+          subprocess.run(['open', str(folder_path)])
+      else:
+          subprocess.run(['xdg-open', str(folder_path)])
+error_message: |
+  Headless servers raise `_tkinter.TclError: no display name and no $DISPLAY environment variable`.
+root_cause: |
+  Endpoints attempted to launch GUI dialogs on server without checking for headless environment.
+solution: |
+  Added DISPLAY environment variable check to disable GUI endpoints in headless mode.
+  Endpoints now return 503 Service Unavailable with helpful error message when DISPLAY is not set.
+fix_commit: null
+fix_pr: null
+test_coverage:
+  has_unit_test: false
+  has_integration_test: false
+  regression_test_added: false
+tags:
+  - "security"
+  - "deployment"
+related_bugs: []
+blocked_by: []
+blocks: []
+notes: |
+  This needs a hosted-mode toggle or feature removal before partnering with external integrators.
+attachments:
+  screenshots: []
+  logs: []
+  recordings: []

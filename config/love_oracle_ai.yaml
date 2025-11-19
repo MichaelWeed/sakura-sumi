@@ -1,0 +1,60 @@
+# Example Configuration Template
+# Optimized settings for React/TypeScript/Tailwind codebase
+# Copy this file and customize for your project
+
+source_directory: "/path/to/your/codebase"
+
+# Exclusion patterns specific to Love Oracle AI
+exclusions:
+  - "android"           # Android build files (Capacitor)
+  - "dist"              # Build output
+  - "latest"            # Build artifacts
+  - "node_modules"      # Dependencies
+  - ".gradle"           # Gradle cache
+  - "gradle"            # Gradle wrapper
+  - "bin"               # Binary files
+  - "*.log"             # Log files
+  - "build_log.txt"     # Build logs
+
+# Key source directories
+source_directories:
+  - "client/"           # React frontend
+  - "server/"           # Express backend
+  - "shared/"           # Shared code
+
+# Compression settings optimized for TypeScript/React
+compression:
+  font_size: 8          # Dense layout
+  margin: 0.3           # Minimal margins (inches)
+  max_line_length: 110  # Characters per line
+
+# Processing options
+processing:
+  parallel: true
+  workers: 4            # Adjust based on CPU
+  batch_size: 10
+  retry_count: 3
+
+# OCR compression (optional)
+ocr:
+  enabled: false        # Set to true if dependencies installed
+  mode: "small"         # 7x compression, 97% accuracy
+  cache_dir: null      # Auto-generated
+
+# Output settings
+output:
+  directory: null       # Auto: {source}_ocr_ready
+  generate_report: "markdown"
+  generate_charts: true
+
+# Notes
+notes: |
+  This is an example configuration template for React/TypeScript/Tailwind codebases.
+  Customize the settings below for your specific project needs.
+  
+  Recommended settings:
+  - Use parallel processing for faster conversion
+  - Enable metrics reporting to verify Gemini compatibility
+  - PDF format is sufficient for most analysis needs
+  - OCR compression optional (requires heavy dependencies)
+

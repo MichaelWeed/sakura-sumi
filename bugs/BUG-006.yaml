@@ -1,0 +1,74 @@
+id: "BUG-006"
+title: "KeyError in _print_summary when using run_smart_concatenation - missing files_already_processed"
+status: "resolved"
+priority: "high"
+severity: "major"
+
+created_date: "2025-01-16"
+updated_date: "2025-01-16"
+resolved_date: "2025-01-16"
+reporter: "test_automation"
+assignee: "test_automation"
+
+environment:
+  os: "macOS / Linux / Windows"
+  language_version: "Python 3.8+"
+
+description: |
+  When calling CompressionPipeline.run_smart_concatenation(), the method returns a results dictionary
+  that doesn't include 'files_already_processed' in the summary, but _print_summary() expects this key
+  to exist. This causes a KeyError when verbose=True.
+
+steps_to_reproduce:
+  - "Step 1: Create a CompressionPipeline instance"
+  - "Step 2: Call run_smart_concatenation() with verbose=True"
+  - "Step 3: Observe KeyError: 'files_already_processed'"
+
+expected_behavior: |
+  The summary dictionary should include all keys expected by _print_summary(), or _print_summary()
+  should check for key existence before accessing it.
+
+actual_behavior: |
+  KeyError is raised when _print_summary() tries to access results['summary']['files_already_processed']
+  which doesn't exist in the results from run_smart_concatenation().
+
+affected_files:
+  - "src/compression/pipeline.py"
+
+affected_functions:
+  - "CompressionPipeline.run_smart_concatenation()"
+  - "CompressionPipeline._print_summary()"
+
+error_message: |
+  KeyError: 'files_already_processed'
+
+root_cause: |
+  The run_smart_concatenation() method doesn't include 'files_already_processed' in the summary dictionary,
+  but _print_summary() unconditionally accesses it. Smart concatenation doesn't support resume functionality,
+  so this field should be set to 0.
+
+solution: |
+  Added 'files_already_processed': 0 to the summary dictionary in run_smart_concatenation() method
+  with a comment explaining that smart concatenation doesn't support resume.
+
+fix_commit: null
+fix_pr: null
+
+test_coverage:
+  has_unit_test: false
+  has_integration_test: false
+  regression_test_added: false
+
+tags:
+  - "pipeline"
+  - "smart-concatenation"
+  - "error-handling"
+
+related_bugs: []
+blocked_by: []
+blocks: []
+
+notes: |
+  Discovered during comprehensive testing of the compression system.
+  Fixed immediately to allow testing to continue.
+

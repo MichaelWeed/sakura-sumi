@@ -1,0 +1,80 @@
+id: "BUG-007"
+title: "Web UI max_total_pages default mismatch - defaults to 10 instead of 1000"
+status: "resolved"
+priority: "medium"
+severity: "moderate"
+
+created_date: "2025-01-16"
+updated_date: "2025-01-16"
+resolved_date: "2025-01-16"
+reporter: "test_automation"
+assignee: "test_automation"
+
+environment:
+  os: "macOS / Linux / Windows"
+  browser: "All browsers"
+  language_version: "JavaScript/HTML"
+
+description: |
+  The web UI form has a default value mismatch for max_total_pages. When the field is empty,
+  it defaults to 10, but the backend expects 1000 as the default. This causes the UI to send
+  incorrect values to the backend when users don't explicitly set this field.
+
+steps_to_reproduce:
+  - "Step 1: Open web UI"
+  - "Step 2: Leave max_total_pages field empty"
+  - "Step 3: Submit compression job"
+  - "Step 4: Backend receives max_total_pages=10 instead of 1000"
+
+expected_behavior: |
+  The web UI should default max_total_pages to 1000 to match the backend default.
+
+actual_behavior: |
+  The web UI defaults max_total_pages to 10, causing a mismatch with backend expectations.
+
+affected_files:
+  - "src/web/templates/index.html"
+
+affected_functions:
+  - "Form submission handler (line 1336)"
+
+code_snippet: |
+  // Before fix (line 1336):
+  max_total_pages: parseInt(document.getElementById('max_total_pages').value) || 10,
+  
+  // After fix:
+  max_total_pages: parseInt(document.getElementById('max_total_pages').value) || 1000,
+
+error_message: |
+  No error thrown, but incorrect default value sent to backend.
+
+root_cause: |
+  Copy-paste error or oversight when setting default values. The max_total_pages field
+  was set to 10 (matching max_pdfs) instead of 1000 (matching backend default).
+
+solution: |
+  Changed the default value from 10 to 1000 in the form submission handler to match
+  the backend default in CompressionPipeline.run_smart_concatenation().
+
+fix_commit: null
+fix_pr: null
+
+test_coverage:
+  has_unit_test: false
+  has_integration_test: false
+  regression_test_added: false
+
+tags:
+  - "web-ui"
+  - "default-values"
+  - "smart-concatenation"
+
+related_bugs: []
+blocked_by: []
+blocks: []
+
+notes: |
+  Discovered during comprehensive testing of the web UI. This bug would cause
+  compression jobs to fail or behave unexpectedly when users don't explicitly set
+  max_total_pages, as the backend would receive a much lower limit than expected.
+

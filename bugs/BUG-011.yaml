@@ -1,0 +1,85 @@
+id: "BUG-011"
+title: "UI crash when job results missing summary (showResults TypeError)"
+status: "open"
+priority: "medium"
+severity: "moderate"
+created_date: "2025-02-14"
+updated_date: "2025-02-14"
+resolved_date: null
+reporter: "user"
+assignee: "unassigned"
+
+environment:
+  os: "macOS 14.5"
+  browser: "Chrome 120"
+  language_version: "Python 3.11"
+  dependencies: []
+
+description: |
+  When a compression job finishes without producing a valid `summary`
+  object (e.g. the backend returns `success: False` because no files were
+  discovered), the frontend's `showResults` function still tries to read
+  `results.summary.files_discovered`. Because `summary` is undefined, the
+  page throws `TypeError: Cannot read properties of undefined (reading 'files_discovered')`
+  and the UI becomes unusable.
+
+steps_to_reproduce:
+  - "Step 1: Start a compression job that produces no files (e.g. point at an empty directory or one filtered entirely by exclusions)."
+  - "Step 2: Wait for the job to complete so results are rendered in the web portal."
+  - "Step 3: Observe the browser console error and the broken results card."
+
+expected_behavior: |
+  The web portal should handle missing/failed job summaries gracefully
+  and present a readable error state rather than crashing.
+
+actual_behavior: |
+  showResults assumes `results.summary` exists and immediately accesses
+  `files_discovered`, resulting in a TypeError and preventing the user from
+  returning to the form without a full refresh.
+
+affected_files:
+  - "src/web/templates/index.html"
+
+affected_functions:
+  - "showResults()"
+
+code_snippet: |
+  // In showResults (index.html)
+  resultsContent.innerHTML = `
+      <div class="grid grid-cols-2 gap-4">
+          <div>
+              <p class="text-sm text-gray-600">Files Discovered</p>
+              <p class="text-2xl font-bold">${results.summary.files_discovered}</p>
+          </div>
+  // ...
+
+error_message: |
+  TypeError: Cannot read properties of undefined (reading 'files_discovered')
+
+resolution:
+  root_cause: null
+  solution: null
+  fix_commit: null
+  fix_pr: null
+
+test_coverage:
+  has_unit_test: false
+  has_integration_test: false
+  regression_test_added: false
+
+tags:
+  - "frontend"
+  - "web"
+
+related_bugs: []
+blocked_by: []
+blocks: []
+
+notes: |
+  Needs defensive rendering for failed jobs and additional UX around error results.
+
+attachments:
+  screenshots: []
+  logs: []
+  recordings: []
+

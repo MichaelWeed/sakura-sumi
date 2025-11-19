@@ -1,0 +1,73 @@
+id: "BUG-009"
+title: "Prompt Collector dialog buttons outside viewport and not clickable"
+status: "resolved"
+priority: "medium"
+severity: "moderate"
+
+created_date: "2025-01-17"
+updated_date: "2025-01-17"
+resolved_date: "2025-01-17"
+reporter: "AI Tester"
+assignee: null
+
+environment:
+  os: "macOS / Linux / Windows"
+  browser: "Chrome / Firefox / Safari"
+  language_version: "Python 3.8+"
+  dependencies: []
+
+description: |
+  The Prompt Collector dialog has action buttons (Estimate Tokens, Compress Prompts, Clear All) that are positioned outside the visible viewport. When attempting to click these buttons, the browser automation times out because the elements are not accessible. This prevents users from using these features without manual scrolling.
+
+steps_to_reproduce:
+  - "Step 1: Open the Prompt Collector dialog by clicking the 'Prompt Collector' button"
+  - "Step 2: Add a prompt by typing in the text field"
+  - "Step 3: Attempt to click 'Estimate Tokens' or 'Compress Prompts' buttons"
+  - "Step 4: Observe timeout error or inability to click"
+
+expected_behavior: |
+  All buttons in the Prompt Collector dialog should be visible and clickable within the viewport, or the dialog should be scrollable to access all buttons.
+
+actual_behavior: |
+  The buttons are rendered outside the viewport. Browser automation tools report: "element is outside of the viewport" and timeout after 30 seconds of attempting to scroll the element into view. Users would need to manually scroll to access these buttons.
+
+code_context:
+  affected_files:
+    - "src/web/templates/index.html"
+  affected_functions: []
+  code_snippet: |
+    # Prompt Collector dialog buttons section
+    # Likely CSS/layout issue causing buttons to be positioned below viewport
+  error_message: |
+    Error calling tool browser_click: Timeout 30000ms exceeded. Element is outside of the viewport.
+
+resolution:
+  root_cause: "Prompt drawer had overflow-y: auto on the container itself, causing the footer to be pushed outside viewport. Missing flex-shrink: 0 on header and footer, and missing min-height: 0 on body."
+  solution: "Fixed flexbox layout: Changed drawer overflow to 'hidden', added flex-shrink: 0 to header and footer, added min-height: 0 to body, and added max-height: 100vh to drawer. Now only the body scrolls while footer stays visible."
+  fix_commit: null
+  fix_pr: null
+
+testing:
+  test_coverage:
+    has_unit_test: false
+    has_integration_test: false
+    regression_test_added: false
+
+metadata:
+  tags: ["ui", "accessibility", "dialog", "viewport", "prompt-collector"]
+  related_bugs: []
+  blocked_by: []
+  blocks: []
+
+notes: |
+  This is a UI/UX issue that affects accessibility. The dialog may need:
+  1. Maximum height constraint with internal scrolling
+  2. Better button positioning (sticky footer or repositioned)
+  3. Dialog size adjustment to fit content
+  4. Responsive design improvements
+
+attachments:
+  screenshots: []
+  logs: []
+  recordings: []
+

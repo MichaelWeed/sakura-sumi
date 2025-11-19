@@ -1,0 +1,75 @@
+id: "BUG-010"
+title: "Job History 'Open Folder' buttons timeout when clicked via automation"
+status: "resolved"
+priority: "low"
+severity: "minor"
+
+created_date: "2025-01-17"
+updated_date: "2025-01-17"
+resolved_date: "2025-01-17"
+reporter: "AI Tester"
+assignee: null
+
+environment:
+  os: "macOS / Linux / Windows"
+  browser: "Chrome / Firefox / Safari"
+  language_version: "Python 3.8+"
+  dependencies: []
+
+description: |
+  When attempting to click "Open Folder" buttons in the Job History table via browser automation, the click action times out. This may indicate the buttons are not properly accessible or there's a viewport/rendering issue with the job history table.
+
+steps_to_reproduce:
+  - "Step 1: Navigate to http://localhost:5001"
+  - "Step 2: Scroll to Job History section"
+  - "Step 3: Attempt to click any 'Open Folder' button for a completed job"
+  - "Step 4: Observe timeout error"
+
+expected_behavior: |
+  The "Open Folder" buttons should be clickable and should open the job's output directory in the system file manager.
+
+actual_behavior: |
+  Browser automation times out when attempting to click the buttons. Error: "Error calling tool browser_click: Timeout 30000ms exceeded."
+
+code_context:
+  affected_files:
+    - "src/web/templates/index.html"
+    - "src/web/app.py"
+  affected_functions:
+    - "open_folder()"
+  code_snippet: |
+    # Job History table with Open Folder buttons
+    # Button click handlers in JavaScript
+  error_message: |
+    Error calling tool browser_click: Timeout 30000ms exceeded.
+
+resolution:
+  root_cause: "Buttons lacked proper accessibility attributes and focus styles, which may have caused automation tools to have difficulty locating/interacting with them."
+  solution: "Added type='button', aria-label attributes, and focus:outline-none focus:ring-2 focus:ring-offset-1 classes to improve accessibility and ensure buttons are properly identifiable by automation tools."
+  fix_commit: null
+  fix_pr: null
+
+testing:
+  test_coverage:
+    has_unit_test: false
+    has_integration_test: false
+    regression_test_added: false
+
+metadata:
+  tags: ["ui", "job-history", "button", "timeout"]
+  related_bugs: ["BUG-009"]
+  blocked_by: []
+  blocks: []
+
+notes: |
+  This may be related to BUG-009 (viewport issues). The buttons may be functional when manually clicked but have accessibility issues for automation. Further investigation needed to determine if this is:
+  1. A viewport/scroll issue
+  2. A JavaScript event handler issue
+  3. A CSS z-index or overlay issue
+  4. An automation-specific problem
+
+attachments:
+  screenshots: []
+  logs: []
+  recordings: []
+
