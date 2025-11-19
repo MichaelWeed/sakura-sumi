@@ -1,0 +1,2700 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌸 Sakura Sumi - OCR Compression Portal</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌸</text></svg>">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Sakura Color Palette */
+        :root {
+            --sakura-blossom: #FFB7C5;
+            --sakura-petal: #FFE4E1;
+            --sakura-accent: #FF69B4;
+            --sakura-branch: #8B4513;
+            --sakura-gradient-start: #FFF0F5;
+            --sakura-gradient-end: #FFE4E1;
+        }
+
+        /* Background with sakura image */
+        body {
+            background-image: url('https://www.shutterstock.com/image-vector/delicate-cherry-blossoms-soft-watercolor-600nw-2579334533.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
+            position: relative;
+        }
+        
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: linear-gradient(to bottom, rgba(255, 240, 245, 0.85), rgba(255, 228, 225, 0.9));
+            z-index: -1;
+        }
+
+        /* Petal container for animations */
+        #petal-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1000;
+            overflow: hidden;
+        }
+
+        .petal {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background: radial-gradient(circle, var(--sakura-blossom), var(--sakura-petal));
+            border-radius: 50% 0 50% 50%;
+            opacity: 0.7;
+            pointer-events: none;
+            animation: fall linear infinite;
+        }
+
+        @keyframes fall {
+            0% {
+                transform: translateY(-10px) rotate(0deg);
+                opacity: 0.7;
+            }
+            100% {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        .progress-bar {
+            transition: width 0.3s ease;
+        }
+        .token-bar {
+            transition: width 0.8s ease-in-out;
+        }
+        .collapsible-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+        .collapsible-content.expanded {
+            max-height: 1000px;
+            transition: max-height 0.5s ease-in;
+        }
+        .tooltip-icon {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background-color: var(--sakura-accent);
+            color: white;
+            text-align: center;
+            line-height: 16px;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: help;
+            margin-left: 4px;
+            vertical-align: middle;
+        }
+        .tooltip-icon:hover {
+            background-color: var(--sakura-branch);
+        }
+        .tooltip {
+            position: fixed;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), var(--sakura-petal));
+            color: #333;
+            padding: 12px;
+            border-radius: 12px;
+            font-size: 13px;
+            line-height: 1.5;
+            max-width: 320px;
+            z-index: 30;
+            box-shadow: 0 4px 12px rgba(255, 105, 180, 0.2);
+            border: 1px solid var(--sakura-blossom);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease-in-out;
+        }
+        .tooltip.visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .tooltip::before {
+            content: '';
+            position: absolute;
+            border: 6px solid transparent;
+            border-bottom-color: var(--sakura-blossom);
+            top: -12px;
+            left: 20px;
+        }
+        .tooltip h4 {
+            margin: 0 0 8px 0;
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--sakura-accent);
+        }
+        .tooltip p {
+            margin: 0 0 8px 0;
+        }
+        .tooltip ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+        .tooltip li {
+            margin: 4px 0;
+        }
+        /* Loading Spinner */
+        .spinner {
+            border: 3px solid var(--sakura-petal);
+            border-top: 3px solid var(--sakura-accent);
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+        }
+        .spinner-small {
+            width: 16px;
+            height: 16px;
+            border-width: 2px;
+        }
+        .spinner-large {
+            width: 32px;
+            height: 32px;
+            border-width: 4px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        /* Skeleton Screen */
+        .skeleton {
+            background: linear-gradient(90deg, var(--sakura-petal) 25%, var(--sakura-gradient-start) 50%, var(--sakura-petal) 75%);
+            background-size: 200% 100%;
+            animation: skeleton-loading 2s ease-in-out infinite;
+        }
+        @keyframes skeleton-loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+        /* Toast Container */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 50;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            max-width: 320px;
+        }
+        .toast {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), var(--sakura-petal));
+            padding: 16px;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(255, 105, 180, 0.2);
+            border-left: 4px solid;
+            display: flex;
+            align-items: start;
+            gap: 12px;
+            animation: toast-slide-in 0.3s ease-out;
+            position: relative;
+        }
+        .toast-success { border-left-color: #16A34A; }
+        .toast-error { border-left-color: #EF4444; }
+        .toast-warning { border-left-color: #EAB308; }
+        .toast-info { border-left-color: var(--sakura-accent); }
+        @keyframes toast-slide-in {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        .toast.fade-out {
+            animation: toast-fade-out 0.3s ease-in forwards;
+        }
+        @keyframes toast-fade-out {
+            to {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+        }
+        /* Modal */
+        .modal-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(139, 69, 19, 0.3);
+            z-index: 40;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: modal-fade-in 0.2s ease-out;
+        }
+        .modal-backdrop.hidden {
+            display: none;
+        }
+        @keyframes modal-fade-in {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .modal {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.98), var(--sakura-gradient-start));
+            border-radius: 20px;
+            box-shadow: 0 20px 25px -5px rgba(255, 105, 180, 0.3);
+            border: 1px solid var(--sakura-blossom);
+            max-width: 28rem;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 24px;
+            animation: modal-scale-in 0.2s ease-out;
+            z-index: 40;
+        }
+        @keyframes modal-scale-in {
+            from {
+                transform: scale(0.95);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        /* Sakura-themed card styling */
+        /* Ensure token estimation panel doesn't overlap with drawer */
+        #tokenEstimation {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .sakura-card {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), var(--sakura-gradient-start));
+            border-radius: 20px;
+            box-shadow: 0 4px 20px rgba(255, 183, 197, 0.3);
+            border: 1px solid var(--sakura-blossom);
+        }
+
+        /* Sakura header gradient */
+        .sakura-header {
+            background: linear-gradient(135deg, var(--sakura-gradient-start), var(--sakura-gradient-end));
+            border-radius: 20px 20px 0 0;
+            padding: 1.5rem;
+            margin: -1.5rem -1.5rem 1.5rem -1.5rem;
+        }
+
+        /* Button hover effects */
+        .sakura-browse-btn {
+            background: linear-gradient(135deg, var(--sakura-petal), var(--sakura-blossom));
+            color: var(--sakura-branch);
+            border: 1px solid var(--sakura-blossom);
+        }
+        .sakura-browse-btn:hover {
+            background: linear-gradient(135deg, var(--sakura-blossom), var(--sakura-accent));
+            color: white;
+        }
+
+        /* Input focus styles */
+        .sakura-input:focus {
+            border-color: var(--sakura-accent) !important;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(255, 105, 180, 0.5);
+        }
+
+        /* Progress bars with sakura colors */
+        .sakura-progress {
+            background: linear-gradient(90deg, var(--sakura-accent), var(--sakura-blossom));
+        }
+
+        /* Sakura input border */
+        .sakura-input {
+            border-color: var(--sakura-blossom);
+        }
+
+        /* Sakura link hover */
+        .sakura-link {
+            color: var(--sakura-accent);
+        }
+        .sakura-link:hover {
+            color: var(--sakura-branch);
+        }
+
+        /* Sakura submit button */
+        .sakura-submit-btn {
+            background: linear-gradient(135deg, var(--sakura-accent), var(--sakura-blossom));
+        }
+        .sakura-submit-btn:hover {
+            background: linear-gradient(135deg, var(--sakura-blossom), var(--sakura-accent));
+        }
+
+        /* Download button */
+        .sakura-download-btn {
+            background: linear-gradient(135deg, #16A34A, #22C55E);
+        }
+        .sakura-download-btn:hover {
+            background: linear-gradient(135deg, #22C55E, #16A34A);
+        }
+
+        /* Haiku styling - Easy to remove: delete the #haiku-section block */
+        #haiku-section {
+            font-family: 'Dancing Script', cursive;
+            font-size: 1.5rem;
+            font-weight: 500;
+            text-align: center;
+            opacity: 0.6;
+            color: var(--sakura-branch);
+            padding: 2rem 1rem;
+            line-height: 2;
+            letter-spacing: 0.05em;
+        }
+        #haiku-section p {
+            margin: 0.5rem 0;
+        }
+        /* Prompt Collector Drawer */
+        .prompt-drawer {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: min(420px, 100%);
+            height: 100%;
+            max-height: 100vh;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), var(--sakura-petal));
+            box-shadow: -12px 0 30px rgba(139, 69, 19, 0.15);
+            z-index: 60;
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .prompt-drawer.open {
+            transform: translateX(0);
+        }
+        .prompt-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.35);
+            z-index: 50;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        .prompt-backdrop.visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .prompt-toggle-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 14px;
+            border-radius: 999px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.6), var(--sakura-petal));
+            border: 1px solid rgba(255, 183, 197, 0.5);
+            font-size: 0.9rem;
+            color: var(--sakura-accent);
+            font-weight: 600;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .prompt-toggle-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 20px rgba(255, 105, 180, 0.2);
+        }
+        .prompt-toggle-btn:focus-visible {
+            outline: 2px solid var(--sakura-accent);
+            outline-offset: 2px;
+        }
+        .prompt-badge {
+            background: var(--sakura-accent);
+            color: white;
+            border-radius: 999px;
+            padding: 0 8px;
+            font-size: 0.75rem;
+            min-width: 28px;
+            text-align: center;
+        }
+        .prompt-drawer-header {
+            padding: 24px;
+            border-bottom: 1px solid rgba(255, 183, 197, 0.4);
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 16px;
+            flex-shrink: 0;
+        }
+        .prompt-drawer-body {
+            padding: 24px;
+            overflow-y: auto;
+            flex: 1;
+            min-height: 0;
+        }
+        .prompt-card {
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(255, 183, 197, 0.6);
+            border-radius: 16px;
+            padding: 16px;
+            box-shadow: 0 6px 16px rgba(255, 105, 180, 0.08);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            position: relative;
+        }
+        .prompt-card textarea {
+            width: 100%;
+            border: none;
+            background: transparent;
+            resize: none;
+            font-size: 0.9rem;
+            line-height: 1.4;
+            color: #374151;
+            min-height: 80px;
+        }
+        .prompt-card textarea:focus {
+            outline: none;
+        }
+        .prompt-card input[type="text"] {
+            border: none;
+            font-weight: 600;
+            color: var(--sakura-accent);
+            background: transparent;
+            font-size: 0.95rem;
+        }
+        .prompt-card input[type="text"]:focus {
+            outline: none;
+        }
+        .prompt-card-actions {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            display: flex;
+            gap: 6px;
+        }
+        .prompt-card-actions button {
+            border: none;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 50%;
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #9CA3AF;
+            transition: background 0.2s ease, color 0.2s ease;
+        }
+        .prompt-card-actions button:hover {
+            background: rgba(255, 105, 180, 0.1);
+            color: var(--sakura-accent);
+        }
+        .prompt-adder {
+            margin-top: 16px;
+            border: 2px dashed rgba(255, 183, 197, 0.7);
+            border-radius: 16px;
+            padding: 16px 12px;
+            text-align: center;
+            transition: background 0.2s ease, border-color 0.2s ease;
+            position: relative;
+        }
+        .prompt-adder-button {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            border: none;
+            background: var(--sakura-accent);
+            color: white;
+            font-size: 1.5rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+        .prompt-adder-button:focus-visible {
+            outline: 2px solid white;
+            outline-offset: 3px;
+        }
+        .prompt-adder.active {
+            background: rgba(255, 255, 255, 0.95);
+            border-color: var(--sakura-accent);
+        }
+        .prompt-adder-panel {
+            margin-top: 12px;
+            max-height: 0;
+            opacity: 0;
+            overflow: hidden;
+            transition: max-height 0.2s ease, opacity 0.2s ease;
+        }
+        .prompt-adder.active .prompt-adder-panel {
+            max-height: 240px;
+            opacity: 1;
+        }
+        .prompt-adder textarea {
+            width: 100%;
+            border: 1px solid rgba(255, 183, 197, 0.8);
+            border-radius: 12px;
+            padding: 12px;
+            resize: none;
+            min-height: 120px;
+            font-size: 0.9rem;
+            color: #374151;
+            background: white;
+        }
+        .prompt-drawer-footer {
+            padding: 16px 24px 24px;
+            border-top: 1px solid rgba(255, 183, 197, 0.4);
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.8), rgba(255, 228, 225, 0.8));
+            flex-shrink: 0;
+        }
+        .prompt-footer-stats {
+            font-size: 0.85rem;
+            color: #6B7280;
+            margin-bottom: 12px;
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <!-- Petal Container for Animations -->
+    <div id="petal-container"></div>
+    
+    <!-- Toast Container -->
+    <div id="toastContainer" class="toast-container"></div>
+    
+    <!-- Modal Backdrop -->
+    <div id="modalBackdrop" class="modal-backdrop hidden" onclick="closeModalOnBackdrop(event)">
+        <div id="modalContent" class="modal" onclick="event.stopPropagation()">
+            <div class="flex justify-between items-center mb-4">
+                <h3 id="modalTitle" class="text-xl font-semibold text-gray-900"></h3>
+                <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            <div id="modalBody" class="text-gray-700"></div>
+            <div id="modalFooter" class="flex justify-end gap-2 mt-6"></div>
+        </div>
+    </div>
+    <!-- HAIKU SECTION - Easy to remove: delete this entire comment block -->
+    <section id="haiku-section">
+        <p>Light scans faded ink,</p>
+        <p>Machines whisper hidden words,</p>
+        <p>Text awakens free.</p>
+    </section>
+    <!-- END HAIKU SECTION -->
+
+    <div class="container mx-auto px-4 py-8 max-w-4xl">
+        <header class="mb-8 sakura-card p-6">
+            <h1 class="text-4xl font-bold mb-2" style="background: linear-gradient(135deg, var(--sakura-accent), var(--sakura-blossom)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">🌸 Sakura Sumi - OCR Compression Portal</h1>
+            <p class="text-gray-700">Convert your codebase to compressed PDFs for LLM analysis</p>
+        </header>
+
+        <!-- Token Estimation & Insights (shown after directory input) -->
+        <div id="tokenEstimation" class="hidden sakura-card p-6 mb-6">
+            <div class="sakura-header">
+                <h2 class="text-2xl font-semibold mb-0" style="color: var(--sakura-accent);">Token Estimation</h2>
+            </div>
+            
+            <!-- Token Bar -->
+            <div id="tokenBar" class="mb-4">
+                <div class="mb-2">
+                    <div class="flex justify-between mb-1">
+                        <span class="text-sm font-medium text-gray-700">Before Compression</span>
+                        <span id="preTokens" class="text-sm font-bold text-gray-900">-</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-4 relative">
+                        <div id="preTokenBar" class="token-bar sakura-progress h-4 rounded-full" style="width: 100%"></div>
+                    </div>
+                </div>
+                <div>
+                    <div class="flex justify-between mb-1">
+                        <span class="text-sm font-medium text-gray-700">After Compression</span>
+                        <span id="postTokens" class="text-sm font-bold text-gray-900">-</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-4 relative">
+                        <div id="postTokenBar" class="token-bar h-4 rounded-full" style="width: 0%"></div>
+                    </div>
+                </div>
+                <div class="mt-2">
+                    <p class="text-sm text-gray-600">
+                        Savings: <span id="savingsPercent" class="font-semibold">-</span>%
+                        (<span id="savingsTokens" class="font-semibold">-</span> tokens)
+                    </p>
+                </div>
+                <div id="recommendation" class="mt-2"></div>
+            </div>
+
+            <!-- DeepSeek Insights Panel (Collapsible) -->
+            <div class="border-t pt-4">
+                <div class="flex justify-between items-center cursor-pointer" id="insightsToggle">
+                    <h3 class="text-lg font-semibold text-gray-900">DeepSeek-OCR Insights</h3>
+                    <span id="insightsToggleIcon" class="text-gray-500">
+                        <svg id="insightsToggleIconSvg" class="w-5 h-5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </span>
+                </div>
+                
+                <!-- Summary View (Always Visible) -->
+                <div id="insightsSummary" class="mt-3 grid grid-cols-3 gap-4">
+                    <div>
+                        <p class="text-xs text-gray-600">Compression Ratio</p>
+                        <p id="summaryRatio" class="text-lg font-bold">-</p>
+                    </div>
+                    <div>
+                        <p class="text-xs text-gray-600">Accuracy</p>
+                        <p id="summaryAccuracy" class="text-lg font-bold">-</p>
+                    </div>
+                    <div>
+                        <p class="text-xs text-gray-600">Est. Time</p>
+                        <p id="summaryTime" class="text-lg font-bold">-</p>
+                    </div>
+                </div>
+                
+                <!-- Detailed View (Collapsible) -->
+                <div id="insightsDetails" class="collapsible-content mt-4">
+                    <div class="grid grid-cols-2 gap-4 text-sm">
+                        <div>
+                            <p class="text-gray-600">Estimated Pages</p>
+                            <p id="detailPages" class="font-semibold">-</p>
+                        </div>
+                        <div>
+                            <p class="text-gray-600">Text Tokens</p>
+                            <p id="detailTextTokens" class="font-semibold">-</p>
+                        </div>
+                        <div>
+                            <p class="text-gray-600">Vision Tokens</p>
+                            <p id="detailVisionTokens" class="font-semibold">-</p>
+                        </div>
+                        <div>
+                            <p class="text-gray-600">Conversion Ratio</p>
+                            <p id="detailConversion" class="font-semibold">-</p>
+                        </div>
+                        <div>
+                            <p class="text-gray-600">Throughput Capacity</p>
+                            <p id="detailThroughput" class="font-semibold">-</p>
+                        </div>
+                        <div>
+                            <p class="text-gray-600">Model Version</p>
+                            <p id="detailModel" class="font-semibold">-</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Compression Form -->
+        <div id="compression-form" class="sakura-card p-6 mb-6">
+            <div class="sakura-header flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                <h2 class="text-2xl font-semibold mb-0" style="color: var(--sakura-accent);">Start Compression</h2>
+                <div class="flex items-center gap-3">
+                    <button
+                        type="button"
+                        id="promptCollectorToggle"
+                        class="prompt-toggle-btn"
+                    >
+                        <span>Prompt Collector</span>
+                        <span id="promptCollectorCount" class="prompt-badge hidden">0</span>
+                    </button>
+                </div>
+            </div>
+            
+            <form id="compressForm" class="space-y-4">
+                <div>
+                    <label for="source_dir" class="block text-sm font-medium text-gray-700 mb-1">
+                        Source Directory
+                    </label>
+                    <div class="flex gap-2">
+                        <input
+                            type="text"
+                            id="source_dir"
+                            name="source_dir"
+                            required
+                            placeholder="/path/to/codebase"
+                            class="flex-1 px-3 py-2 border rounded-xl sakura-input"
+                        />
+                        <button
+                            type="button"
+                            id="browseSourceBtn"
+                            class="px-4 py-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-opacity-50 transition-all duration-200 sakura-browse-btn"
+                        >
+                            Browse...
+                        </button>
+                    </div>
+                    <p class="mt-1 text-sm text-gray-500">Absolute path to your codebase directory</p>
+                    <button
+                        type="button"
+                        id="estimateBtn"
+                        class="mt-2 text-sm underline transition-colors duration-200 sakura-link"
+                    >
+                        Estimate Tokens
+                    </button>
+                </div>
+
+                <div>
+                    <label for="output_dir" class="block text-sm font-medium text-gray-700 mb-1">
+                        Output Directory (optional)
+                    </label>
+                    <div class="flex gap-2">
+                        <input
+                            type="text"
+                            id="output_dir"
+                            name="output_dir"
+                            placeholder="Auto-generated if not specified"
+                            class="flex-1 px-3 py-2 border rounded-xl sakura-input"
+                        />
+                        <button
+                            type="button"
+                            id="browseOutputBtn"
+                            class="px-4 py-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-opacity-50 transition-all duration-200 sakura-browse-btn"
+                        >
+                            Browse...
+                        </button>
+                    </div>
+                    <p class="mt-1 text-sm text-gray-500">If not specified, a new directory will be created: <code class="bg-gray-100 px-1 py-0.5 rounded text-xs">{source_directory}_ocr_ready</code></p>
+                    <p class="mt-1 text-xs text-gray-400">Example: If source is <code class="bg-gray-100 px-1 py-0.5 rounded">/path/to/myproject</code>, output will be <code class="bg-gray-100 px-1 py-0.5 rounded">/path/to/myproject_ocr_ready</code></p>
+                </div>
+
+                <div>
+                    <label for="exclusions" class="block text-sm font-medium text-gray-700 mb-1">
+                        Exclusions (one per line, .gitignore-style)
+                    </label>
+                    <textarea
+                        id="exclusions"
+                        name="exclusions"
+                        rows="6"
+                        placeholder="node_modules/&#10;.git/&#10;.DS_Store&#10;__pycache__/&#10;*.log&#10;build/&#10;dist/"
+                        class="w-full px-3 py-2 border rounded-xl sakura-input font-mono text-sm"
+                    >node_modules/
+.git/
+.DS_Store
+__pycache__/
+*.log
+build/
+dist/</textarea>
+                    <p class="mt-1 text-sm text-gray-500">Files and folders matching these patterns will be excluded from compression</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="relative">
+                        <label class="flex items-center">
+                            <input
+                                type="checkbox"
+                                id="parallel"
+                                name="parallel"
+                                class="mr-2"
+                                checked
+                            />
+                            <span class="text-sm font-medium text-gray-700">Parallel Processing</span>
+                            <span class="tooltip-icon" data-tooltip="parallel">i</span>
+                        </label>
+                        <div id="tooltip-parallel" class="tooltip">
+                            <h4>Parallel Processing</h4>
+                            <p><strong>What:</strong> Processes multiple files simultaneously using multiple CPU cores, significantly speeding up compression for large codebases.</p>
+                            <p><strong>Use-Case:</strong></p>
+                            <ul>
+                                <li>Compress large codebases (100+ files) faster</li>
+                                <li>Reduce total processing time by 2-4x on multi-core systems</li>
+                                <li>Better utilize available system resources</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="relative">
+                        <label class="flex items-center">
+                            <input
+                                type="checkbox"
+                                id="resume"
+                                name="resume"
+                                class="mr-2"
+                                checked
+                            />
+                            <span class="text-sm font-medium text-gray-700">Resume from Checkpoint</span>
+                            <span class="tooltip-icon" data-tooltip="resume">i</span>
+                        </label>
+                        <div id="tooltip-resume" class="tooltip">
+                            <h4>Resume from Checkpoint</h4>
+                            <p><strong>What:</strong> Automatically resumes compression from where it left off if interrupted, skipping already-processed files.</p>
+                            <p><strong>Use-Case:</strong></p>
+                            <ul>
+                                <li>Recover from crashes or interruptions without restarting</li>
+                                <li>Save time on large codebases that were partially processed</li>
+                                <li>Continue compression after system restarts or network issues</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="relative">
+                        <label class="flex items-center">
+                            <input
+                                type="checkbox"
+                                id="ocr_enabled"
+                                name="ocr_enabled"
+                                class="mr-2"
+                                checked
+                            />
+                            <span class="text-sm font-medium text-gray-700">Enable OCR Compression</span>
+                            <span class="tooltip-icon" data-tooltip="ocr">i</span>
+                        </label>
+                        <div id="tooltip-ocr" class="tooltip">
+                            <h4>Enable OCR Compression</h4>
+                            <p><strong>What:</strong> Applies DeepSeek-OCR compression to PDFs, achieving 10x token reduction (1k text tokens → 100 vision tokens) with 97% accuracy.</p>
+                            <p><strong>Use-Case:</strong></p>
+                            <ul>
+                                <li>Maximize token savings for very large codebases</li>
+                                <li>Fit massive codebases into Gemini's 2M token context window</li>
+                                <li>Reduce LLM API costs by minimizing token usage</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="relative">
+                        <label class="flex items-center">
+                            <input
+                                type="checkbox"
+                                id="smart_concatenation"
+                                name="smart_concatenation"
+                                class="mr-2"
+                                checked
+                            />
+                            <span class="text-sm font-medium text-gray-700">Smart Concatenation (Max 10 PDFs)</span>
+                            <span class="tooltip-icon" data-tooltip="smart_concatenation">i</span>
+                        </label>
+                        <div id="tooltip-smart_concatenation" class="tooltip">
+                            <h4>Smart Concatenation</h4>
+                            <p><strong>What:</strong> Intelligently groups files by directory structure, creating a maximum of 10 well-organized PDFs. Prioritizes key folders (src, components, api, etc.) and rolls up subdirectories when needed.</p>
+                            <p><strong>Use-Case:</strong></p>
+                            <ul>
+                                <li>Create logically separated PDFs for easier navigation</li>
+                                <li>Ensure output never exceeds 10 PDFs (hard limit)</li>
+                                <li>Maintain directory structure while respecting limits</li>
+                                <li>Group root config files together</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Smart Concatenation Options -->
+                <div id="concatenationOptions" class="hidden sakura-card p-4 mb-4 bg-pink-50 border border-pink-200 rounded-xl">
+                    <h3 class="text-lg font-semibold mb-3" style="color: var(--sakura-accent);">Smart Concatenation Settings</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label for="max_pdfs" class="block text-sm font-medium text-gray-700 mb-1">
+                                Max PDFs (Hard Limit)
+                            </label>
+                            <input
+                                type="number"
+                                id="max_pdfs"
+                                name="max_pdfs"
+                                value="10"
+                                min="1"
+                                max="10"
+                                class="w-full px-3 py-2 border rounded-xl sakura-input"
+                            />
+                            <p class="mt-1 text-xs text-gray-500">Maximum number of PDFs to create (1-10)</p>
+                        </div>
+
+                        <div>
+                            <label for="max_pages_per_pdf" class="block text-sm font-medium text-gray-700 mb-1">
+                                Max Pages per PDF
+                            </label>
+                            <input
+                                type="number"
+                                id="max_pages_per_pdf"
+                                name="max_pages_per_pdf"
+                                value="100"
+                                min="1"
+                                class="w-full px-3 py-2 border rounded-xl sakura-input"
+                            />
+                            <p class="mt-1 text-xs text-gray-500">Maximum pages allowed per individual PDF</p>
+                        </div>
+
+                        <div>
+                            <label for="max_size_per_pdf_mb" class="block text-sm font-medium text-gray-700 mb-1">
+                                Max Size per PDF (MB)
+                            </label>
+                            <input
+                                type="number"
+                                id="max_size_per_pdf_mb"
+                                name="max_size_per_pdf_mb"
+                                value="10"
+                                min="1"
+                                step="0.1"
+                                class="w-full px-3 py-2 border rounded-xl sakura-input"
+                            />
+                            <p class="mt-1 text-xs text-gray-500">Maximum file size per PDF in megabytes</p>
+                        </div>
+
+                        <div>
+                            <label for="max_total_pages" class="block text-sm font-medium text-gray-700 mb-1">
+                                Max Total Pages
+                            </label>
+                            <input
+                                type="number"
+                                id="max_total_pages"
+                                name="max_total_pages"
+                                value="1000"
+                                min="1"
+                                class="w-full px-3 py-2 border rounded-xl sakura-input"
+                            />
+                            <p class="mt-1 text-xs text-gray-500">Maximum total pages across all PDFs (10 PDFs × 100 pages = 1000)</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="ocrOptions" class="hidden">
+                    <label for="ocr_mode" class="block text-sm font-medium text-gray-700 mb-1">
+                        OCR Compression Mode
+                    </label>
+                    <select
+                        id="ocr_mode"
+                        name="ocr_mode"
+                        class="w-full px-3 py-2 border rounded-xl sakura-input"
+                    >
+                        <option value="small">Small (7x, 97% accuracy) - 7-times smaller with 97% accuracy</option>
+                        <option value="medium">Medium (10x, 97% accuracy) - 10-times smaller with 97% accuracy</option>
+                        <option value="large">Large (15x, 85-90% accuracy) - 15-times smaller with 85-90% accuracy</option>
+                        <option value="maximum">Maximum (20x, 60% accuracy) - 20-times smaller with 60% accuracy</option>
+                    </select>
+                    <p class="mt-1 text-sm text-gray-500">Compression ratio: "7x, 97% accuracy" means 7-times smaller file size with 97% accuracy</p>
+                    
+                    <!-- HYBRID_MODE_START -->
+                    <div class="mt-3 relative">
+                        <label class="flex items-center">
+                            <input
+                                type="checkbox"
+                                id="hybrid_mode"
+                                name="hybrid_mode"
+                                class="mr-2"
+                            />
+                            <span class="text-sm font-medium text-gray-700">Hybrid Mode</span>
+                            <span class="tooltip-icon" data-tooltip="hybrid">i</span>
+                        </label>
+                        <div id="tooltip-hybrid" class="tooltip">
+                            <h4>Hybrid Mode</h4>
+                            <p><strong>What:</strong> Preprocesses code to replace fragile Unicode characters (box-drawing, special dashes) with ASCII equivalents for better OCR fidelity.</p>
+                            <p><strong>Trade-offs:</strong></p>
+                            <ul>
+                                <li><strong>Fidelity gain:</strong> Preserves code structure that would be lost in aggressive OCR</li>
+                                <li><strong>Density loss:</strong> Slightly increases token count (~5-15%) due to ASCII replacements</li>
+                                <li><strong>Use case:</strong> Code with box-drawing characters, special dashes, or Unicode that commonly fails in OCR</li>
+                            </ul>
+                            <p><strong>Output:</strong> Generates a translation dictionary (YAML) prepended to the first file for reverse-translation if needed.</p>
+                        </div>
+                    </div>
+                    <!-- HYBRID_MODE_END -->
+                </div>
+
+                <div class="relative">
+                    <label for="workers" class="block text-sm font-medium text-gray-700 mb-1">
+                        Workers (optional)
+                        <span class="tooltip-icon" data-tooltip="workers">i</span>
+                    </label>
+                    <input
+                        type="number"
+                        id="workers"
+                        name="workers"
+                        min="1"
+                        placeholder="Auto (CPU count - 1)"
+                        class="w-full px-3 py-2 border rounded-xl sakura-input"
+                    />
+                    <div id="tooltip-workers" class="tooltip">
+                        <h4>Workers (optional)</h4>
+                        <p><strong>What:</strong> Specifies the number of parallel worker threads to use for file processing. If not set, automatically uses (CPU cores - 1).</p>
+                        <p><strong>Use-Case:</strong></p>
+                        <ul>
+                            <li>Fine-tune performance on systems with many CPU cores</li>
+                            <li>Limit resource usage on shared systems or VMs</li>
+                            <li>Optimize for specific hardware configurations</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <button
+                    type="submit"
+                    id="submitBtn"
+                    class="w-full text-white py-3 px-4 rounded-xl focus:outline-none focus:ring-2 focus:ring-opacity-50 font-medium transition-all duration-300 transform hover:scale-105 shadow-lg sakura-submit-btn"
+                >
+                    Start Compression
+                </button>
+            </form>
+        </div>
+
+        <!-- Progress & Log Viewer -->
+        <div id="progress-view" class="hidden sakura-card p-6 mb-6">
+            <div class="sakura-header">
+                <h2 class="text-2xl font-semibold mb-0" style="color: var(--sakura-accent);">Compression Progress</h2>
+            </div>
+            <div id="progressContent">
+                <div class="mb-4">
+                    <div class="flex justify-between mb-1">
+                        <span class="text-sm font-medium text-gray-700" id="progressStatusText">Compressing... Please wait.</span>
+                        <span class="text-sm font-medium text-gray-700" id="progressPercentText">0%</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-2.5">
+                        <div
+                            id="progressViewBar"
+                            class="progress-bar sakura-progress h-2.5 rounded-full"
+                            style="width: 0%"
+                        ></div>
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <p class="text-sm font-medium text-gray-700 mb-2">Status Messages:</p>
+                    <pre id="progressLogs" class="bg-gray-50 border border-gray-200 rounded p-3 text-sm text-gray-700 max-h-64 overflow-y-auto font-mono whitespace-pre-wrap"></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- Job Status -->
+        <div id="jobStatus" class="hidden sakura-card p-6 mb-6">
+            <div class="sakura-header">
+                <h2 class="text-2xl font-semibold mb-0" style="color: var(--sakura-accent);">Job Status</h2>
+            </div>
+            <div id="statusContent">
+                <div class="mb-4">
+                    <div class="flex justify-between mb-1">
+                        <span class="text-sm font-medium text-gray-700" id="statusText">Processing...</span>
+                        <span class="text-sm font-medium text-gray-700" id="progressText">0%</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-2.5">
+                        <div
+                            id="progressBar"
+                            class="progress-bar sakura-progress h-2.5 rounded-full"
+                            style="width: 0%"
+                        ></div>
+                    </div>
+                </div>
+                <p id="statusMessage" class="text-sm text-gray-600"></p>
+            </div>
+        </div>
+
+        <!-- Results -->
+        <div id="results" class="hidden sakura-card p-6 mb-6">
+            <div class="sakura-header">
+                <h2 class="text-2xl font-semibold mb-0" style="color: var(--sakura-accent);">Compression Results</h2>
+            </div>
+            <div id="resultsContent" class="space-y-2"></div>
+            <button
+                id="newJobBtn"
+                class="mt-4 text-white py-2 px-4 rounded-xl focus:outline-none focus:ring-2 focus:ring-opacity-50 transition-all duration-300 transform hover:scale-105 shadow-lg sakura-download-btn"
+            >
+                New Job
+            </button>
+        </div>
+
+        <!-- Job History -->
+        <div class="sakura-card p-6">
+            <div class="sakura-header">
+                <h2 class="text-2xl font-semibold mb-0" style="color: var(--sakura-accent);">Job History</h2>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-4 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Job Name</th>
+                            <th class="px-4 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                            <th class="px-4 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Started At</th>
+                            <th class="px-4 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Progress</th>
+                            <th class="px-4 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="job-history-table-body" class="bg-white divide-y divide-gray-200">
+                        <tr>
+                            <td colspan="5" class="px-4 py-4 text-center text-gray-500 text-sm">No jobs yet</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Prompt Collector Drawer -->
+    <div id="promptDrawerBackdrop" class="prompt-backdrop hidden" aria-hidden="true"></div>
+    <aside id="promptDrawer" class="prompt-drawer" role="dialog" aria-modal="true" aria-labelledby="promptDrawerTitle" aria-hidden="true">
+        <div class="prompt-drawer-header">
+            <div>
+                <h3 id="promptDrawerTitle" class="text-xl font-semibold text-gray-900">Prompt Collector</h3>
+                <p class="text-sm text-gray-500">Paste prompts directly when you don’t have a directory handy. Each prompt becomes a virtual file.</p>
+            </div>
+            <button id="closePromptDrawer" class="text-gray-400 hover:text-gray-600" aria-label="Close prompt collector">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        </div>
+        <div class="prompt-drawer-body">
+            <div id="promptList" class="space-y-4"></div>
+            <div id="promptAdder" class="prompt-adder" tabindex="0">
+                <button type="button" id="promptAdderButton" class="prompt-adder-button" aria-label="Add prompt">+</button>
+                <div class="prompt-adder-panel">
+                    <textarea
+                        id="promptAdderTextarea"
+                        placeholder="Paste or type your prompt here. Leaving this field saves it automatically."
+                    ></textarea>
+                    <p class="text-xs text-gray-400 mt-2">Move away without typing to cancel. Text saves automatically on blur.</p>
+                </div>
+            </div>
+        </div>
+        <div class="prompt-drawer-footer">
+            <div id="promptStats" class="prompt-footer-stats">No prompts yet.</div>
+            <div class="flex flex-col gap-2">
+                <button
+                    type="button"
+                    id="promptEstimateBtn"
+                    class="w-full py-2 px-4 rounded-xl border border-transparent text-sm font-medium text-gray-700 hover:text-gray-900 bg-white hover:border-gray-200 transition-all duration-200 disabled:opacity-50"
+                    disabled
+                >
+                    Estimate Tokens
+                </button>
+                <button
+                    type="button"
+                    id="promptCompressBtn"
+                    class="w-full text-white py-2 px-4 rounded-xl focus:outline-none focus:ring-2 focus:ring-opacity-50 font-medium transition-all duration-200 sakura-submit-btn disabled:opacity-60"
+                    disabled
+                >
+                    Compress Prompts
+                </button>
+                <button
+                    type="button"
+                    id="promptClearBtn"
+                    class="w-full py-2 px-4 rounded-xl border border-transparent text-sm font-medium text-gray-600 hover:text-gray-900 bg-white hover:border-gray-200 transition-all duration-200"
+                >
+                    Clear All
+                </button>
+            </div>
+        </div>
+    </aside>
+
+    <script>
+        let currentJobId = null;
+        let statusInterval = null;
+        let currentEstimates = null;
+        let toastTimeout = null;
+        const promptDrawer = document.getElementById('promptDrawer');
+        const promptDrawerBackdrop = document.getElementById('promptDrawerBackdrop');
+        const promptCollectorToggle = document.getElementById('promptCollectorToggle');
+        const promptCollectorCount = document.getElementById('promptCollectorCount');
+        const promptList = document.getElementById('promptList');
+        const promptAdder = document.getElementById('promptAdder');
+        const promptAdderButton = document.getElementById('promptAdderButton');
+        const promptAdderTextarea = document.getElementById('promptAdderTextarea');
+        const promptCompressBtn = document.getElementById('promptCompressBtn');
+        const promptEstimateBtn = document.getElementById('promptEstimateBtn');
+        const promptClearBtn = document.getElementById('promptClearBtn');
+        const promptStats = document.getElementById('promptStats');
+
+        // Toast Notification System
+        function showToast(message, type = 'info', duration = 5000) {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            
+            // Icon based on type
+            let iconSvg = '';
+            if (type === 'success') {
+                iconSvg = '<svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>';
+            } else if (type === 'error') {
+                iconSvg = '<svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>';
+            } else if (type === 'warning') {
+                iconSvg = '<svg class="w-5 h-5 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>';
+            } else {
+                iconSvg = '<svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>';
+            }
+            
+            toast.innerHTML = `
+                <div class="flex-shrink-0">${iconSvg}</div>
+                <div class="flex-1 text-sm text-gray-700">${message}</div>
+                <button onclick="this.parentElement.classList.add('fade-out'); setTimeout(() => this.parentElement.remove(), 300)" class="flex-shrink-0 text-gray-400 hover:text-gray-600">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            `;
+            
+            container.appendChild(toast);
+            
+            // Auto-dismiss after duration
+            setTimeout(() => {
+                toast.classList.add('fade-out');
+                setTimeout(() => toast.remove(), 300);
+            }, duration);
+        }
+
+        // Modal System
+        function showModal(title, body, footer = '') {
+            document.getElementById('modalTitle').textContent = title;
+            document.getElementById('modalBody').innerHTML = body;
+            document.getElementById('modalFooter').innerHTML = footer;
+            document.getElementById('modalBackdrop').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('modalBackdrop').classList.add('hidden');
+        }
+
+        function closeModalOnBackdrop(event) {
+            if (event.target.id === 'modalBackdrop') {
+                closeModal();
+            }
+        }
+
+        // Loading Spinner Component
+        function createSpinner(size = 'default') {
+            const sizeClass = size === 'small' ? 'spinner-small' : size === 'large' ? 'spinner-large' : '';
+            return `<div class="spinner ${sizeClass}"></div>`;
+        }
+
+        // Skeleton Screen Component
+        function createSkeleton(height = 'h-4', width = 'w-full') {
+            return `<div class="skeleton ${height} ${width} rounded"></div>`;
+        }
+
+        function autoResizeTextarea(el) {
+            if (!el) return;
+            el.style.height = 'auto';
+            el.style.height = `${el.scrollHeight}px`;
+        }
+
+        // Prompt Collector Store (exposed globally for future integrations/export hooks)
+        const PromptCollectorStore = (() => {
+            let prompts = [];
+            let listeners = [];
+            let counter = 1;
+
+            const notify = () => {
+                const snapshot = prompts.map(prompt => ({ ...prompt }));
+                listeners.forEach(cb => cb(snapshot));
+            };
+
+            return {
+                addPrompt(text) {
+                    const value = (text || '').trim();
+                    if (!value) {
+                        return null;
+                    }
+                    const entry = {
+                        id: `prompt-${Date.now()}-${counter++}`,
+                        name: `Prompt ${prompts.length + 1}`,
+                        text: value,
+                        createdAt: new Date().toISOString(),
+                    };
+                    prompts = [...prompts, entry];
+                    notify();
+                    return entry.id;
+                },
+                updatePrompt(id, updates = {}) {
+                    const index = prompts.findIndex(p => p.id === id);
+                    if (index === -1) return;
+                    prompts[index] = { ...prompts[index], ...updates };
+                    notify();
+                },
+                removePrompt(id) {
+                    prompts = prompts.filter(p => p.id !== id);
+                    notify();
+                },
+                clear() {
+                    prompts = [];
+                    counter = 1;
+                    notify();
+                },
+                getPrompts() {
+                    return prompts.map(prompt => ({ ...prompt }));
+                },
+                subscribe(cb) {
+                    if (typeof cb !== 'function') return () => {};
+                    listeners.push(cb);
+                    return () => {
+                        listeners = listeners.filter(listener => listener !== cb);
+                    };
+                },
+            };
+        })();
+        window.PromptCollectorStore = PromptCollectorStore;
+
+        // Format tokens for display - always shows 1 decimal place for consistency
+        function formatTokens(tokens) {
+            if (typeof tokens !== 'number') return tokens;
+            // Round to nearest 100 first for consistency
+            const rounded = Math.round(tokens / 100) * 100;
+            if (rounded >= 1000000) return (rounded / 1000000).toFixed(1) + 'M';
+            if (rounded >= 1000) return (rounded / 1000).toFixed(1) + 'k';
+            return rounded.toString();
+        }
+
+        // Get color based on token count
+        function getTokenColor(preTokens) {
+            if (preTokens < 10000) return 'bg-red-500';
+            if (preTokens < 50000) return 'bg-yellow-500';
+            return 'bg-green-500';
+        }
+
+        // Falling petals animation
+        function createFallingPetals(duration = 3000, count = 30) {
+            const container = document.getElementById('petal-container');
+            if (!container) return;
+
+            // Clear any existing petals
+            container.innerHTML = '';
+
+            for (let i = 0; i < count; i++) {
+                const petal = document.createElement('div');
+                petal.className = 'petal';
+                
+                // Random horizontal position
+                const left = Math.random() * 100;
+                petal.style.left = left + '%';
+                
+                // Random delay for staggered effect
+                const delay = Math.random() * 2;
+                petal.style.animationDelay = delay + 's';
+                
+                // Random animation duration (3-6 seconds)
+                const animDuration = 3 + Math.random() * 3;
+                petal.style.animationDuration = animDuration + 's';
+                
+                // Random size variation
+                const size = 8 + Math.random() * 8;
+                petal.style.width = size + 'px';
+                petal.style.height = size + 'px';
+                
+                // Random rotation
+                const rotation = Math.random() * 360;
+                petal.style.transform = `rotate(${rotation}deg)`;
+                
+                container.appendChild(petal);
+                
+                // Remove petal after animation completes
+                setTimeout(() => {
+                    if (petal.parentNode) {
+                        petal.parentNode.removeChild(petal);
+                    }
+                }, (animDuration + delay) * 1000);
+            }
+        }
+
+        // Show OCR options when OCR is enabled (default: checked)
+        document.getElementById('ocr_enabled').addEventListener('change', function() {
+            document.getElementById('ocrOptions').classList.toggle('hidden', !this.checked);
+        });
+        // Show OCR options by default since checkbox is checked
+        document.getElementById('ocrOptions').classList.remove('hidden');
+        
+        // HYBRID_MODE_START
+        // Console logging for hybrid mode activation
+        const hybridModeCheckbox = document.getElementById('hybrid_mode');
+        if (hybridModeCheckbox) {
+            hybridModeCheckbox.addEventListener('change', function() {
+                if (this.checked) {
+                    console.log('[HYBRID] Hybrid mode enabled - code will be preprocessed for OCR fidelity');
+                } else {
+                    console.log('[HYBRID] Hybrid mode disabled');
+                }
+            });
+        }
+        // HYBRID_MODE_END
+
+        // Show Smart Concatenation options when enabled (default: checked)
+        document.getElementById('smart_concatenation').addEventListener('change', function() {
+            document.getElementById('concatenationOptions').classList.toggle('hidden', !this.checked);
+        });
+        // Show concatenation options by default since checkbox is checked
+        document.getElementById('concatenationOptions').classList.remove('hidden');
+
+        // Browse directory buttons
+        document.getElementById('browseSourceBtn').addEventListener('click', async function() {
+            try {
+                const response = await fetch('/api/browse-directory', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                });
+
+                const data = await response.json();
+                
+                if (response.ok && data.path) {
+                    document.getElementById('source_dir').value = data.path;
+                } else {
+                    showToast('Error: ' + (data.error || 'Could not browse directory'), 'error');
+                }
+            } catch (error) {
+                showToast('Error: ' + error.message, 'error');
+            }
+        });
+
+        document.getElementById('browseOutputBtn').addEventListener('click', async function() {
+            try {
+                const response = await fetch('/api/browse-directory', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                });
+
+                const data = await response.json();
+                
+                if (response.ok && data.path) {
+                    document.getElementById('output_dir').value = data.path;
+                } else {
+                    showToast('Error: ' + (data.error || 'Could not browse directory'), 'error');
+                }
+            } catch (error) {
+                showToast('Error: ' + error.message, 'error');
+            }
+        });
+
+        // Handle estimate button click
+        document.getElementById('estimateBtn').addEventListener('click', async function() {
+            let sourceDir = document.getElementById('source_dir').value.trim();
+            if (!sourceDir) {
+                showToast('Please enter a source directory first', 'warning');
+                return;
+            }
+            
+            // Remove quotes if present
+            sourceDir = sourceDir.replace(/^['"]|['"]$/g, '');
+            
+            // Get exclusions
+            const exclusions = document.getElementById('exclusions').value;
+
+            try {
+                const response = await fetch('/api/estimate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ 
+                        source_dir: sourceDir,
+                        exclusions: exclusions
+                    }),
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    currentEstimates = data;
+                    displayTokenEstimation(data);
+                    displayDeepSeekInsights(data);
+                    document.getElementById('tokenEstimation').classList.remove('hidden');
+                } else {
+                    showToast('Error: ' + (data.error || 'Unknown error'), 'error');
+                }
+            } catch (error) {
+                showToast('Error: ' + error.message, 'error');
+            }
+        });
+
+        // Display token estimation
+        function displayTokenEstimation(data) {
+            const preTokens = Number((data.pre_compression && data.pre_compression.total_tokens) || 0);
+            const fileCount = Number((data.pre_compression && data.pre_compression.file_count) || 0);
+            const postEst = data.post_compression || { estimated_tokens: 0, has_valid_tokens: false };
+            const recommendation = { ...(data.recommendation || {}) };
+
+            const hasValidTokens = postEst.has_valid_tokens !== false && preTokens > 0;
+            const zeroFileWarning = fileCount === 0 || !hasValidTokens;
+
+            const safePre = Math.max(preTokens, 0);
+            const safePost = Math.min(Math.max(postEst.estimated_tokens || 0, 0), safePre);
+            const savings = Math.max(0, safePre - safePost);
+            const savingsPercent = safePre > 0 ? (savings / safePre) * 100 : 0;
+
+            document.getElementById('preTokens').textContent = safePre > 0 ? formatTokens(safePre) : '0';
+            document.getElementById('postTokens').textContent = safePost > 0 ? formatTokens(safePost) : '0';
+            document.getElementById('savingsPercent').textContent = savingsPercent.toFixed(1);
+            document.getElementById('savingsTokens').textContent = formatTokens(savings);
+
+            const preBar = document.getElementById('preTokenBar');
+            const postBar = document.getElementById('postTokenBar');
+            const color = getTokenColor(safePre);
+
+            preBar.className = `token-bar ${color} h-4 rounded-full`;
+            preBar.style.width = safePre > 0 ? '100%' : '0%';
+
+            setTimeout(() => {
+                const postWidth = safePre > 0 ? (safePost / safePre) * 100 : 0;
+                postBar.className = `token-bar ${color} h-4 rounded-full`;
+                postBar.style.width = `${postWidth}%`;
+            }, 300);
+
+            if (zeroFileWarning) {
+                recommendation.severity = 'error';
+                recommendation.message = 'No eligible files were discovered—compression results are undefined for this run.';
+            }
+
+            // Display recommendation with action buttons for warnings/errors
+            const recDiv = document.getElementById('recommendation');
+            const recClass = recommendation.severity === 'error' ? 'bg-red-100 text-red-800 border-red-300' :
+                            recommendation.severity === 'warning' ? 'bg-yellow-100 text-yellow-800 border-yellow-300' :
+                            'bg-green-100 text-green-800 border-green-300';
+            
+            let iconSvg = '';
+            if (recommendation.severity === 'error') {
+                iconSvg = '<svg class="w-5 h-5 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>';
+            } else if (recommendation.severity === 'warning') {
+                iconSvg = '<svg class="w-5 h-5 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>';
+            } else {
+                iconSvg = '<svg class="w-5 h-5 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>';
+            }
+            
+            // Add action buttons for warnings/errors
+            let actionButtons = '';
+            if (zeroFileWarning) {
+                actionButtons = `
+                    <div class="mt-3 flex">
+                        <button
+                            id="goBackBtn"
+                            class="flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 bg-gray-200 hover:bg-gray-300 text-gray-800"
+                        >
+                            Go Back
+                        </button>
+                    </div>
+                `;
+            } else if (recommendation.severity === 'warning' || recommendation.severity === 'error') {
+                actionButtons = `
+                    <div class="mt-3 flex gap-2">
+                        <button
+                            id="proceedBtn"
+                            class="flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${recommendation.severity === 'error' ? 'bg-red-600 hover:bg-red-700' : 'bg-yellow-600 hover:bg-yellow-700'} text-white"
+                        >
+                            Proceed Anyway
+                        </button>
+                        <button
+                            id="goBackBtn"
+                            class="flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 bg-gray-200 hover:bg-gray-300 text-gray-800"
+                        >
+                            Go Back
+                        </button>
+                    </div>
+                `;
+            }
+            
+            recDiv.innerHTML = `
+                <div class="px-3 py-2 rounded border ${recClass}">
+                    <div class="flex items-center gap-2">
+                        <span>${iconSvg}</span>
+                        <span>${recommendation.message}</span>
+                    </div>
+                    ${actionButtons}
+                </div>
+            `;
+            
+            // Store recommendation for conditional submission
+            window.currentRecommendation = recommendation;
+            
+            // Setup button handlers - use setTimeout to ensure buttons exist in DOM
+            if (!zeroFileWarning && (recommendation.severity === 'warning' || recommendation.severity === 'error')) {
+                setTimeout(() => {
+                    const proceedBtn = document.getElementById('proceedBtn');
+                    const goBackBtn = document.getElementById('goBackBtn');
+                    
+                    if (proceedBtn) {
+                        // Remove any existing listeners by cloning the button
+                        const newProceedBtn = proceedBtn.cloneNode(true);
+                        proceedBtn.parentNode.replaceChild(newProceedBtn, proceedBtn);
+                        
+                        newProceedBtn.addEventListener('click', async (e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            
+                            window.recommendationConfirmed = true;
+                            newProceedBtn.disabled = true;
+                            if (goBackBtn) goBackBtn.disabled = true;
+                            
+                            // Use stored submission context
+                            const submissionContext = window.pendingSubmissionContext;
+                            
+                            if (submissionContext && submissionContext.mode === 'code') {
+                                // Directory form submission - use stored formData
+                                await enqueueCompressionJob(submissionContext.formData, {
+                                    ...submissionContext.options,
+                                    triggerElement: document.getElementById('submitBtn'),
+                                    mode: 'code',
+                                    keepTriggerDisabledOnSuccess: true,
+                                });
+                            } else if (submissionContext && submissionContext.mode === 'prompt') {
+                                // Prompt form submission - call handlePromptCompression which will respect confirmation
+                                // recommendationConfirmed is already set, so it will proceed
+                                await handlePromptCompression();
+                            } else {
+                                // Fallback: determine from current state
+                                const sourceDir = sanitizePath(document.getElementById('source_dir')?.value);
+                                if (sourceDir) {
+                                    const exclusions = document.getElementById('exclusions')?.value || '';
+                                    const sharedOptions = collectSharedOptions();
+                                    const formData = {
+                                        ...sharedOptions,
+                                        source_dir: sourceDir,
+                                        exclusions,
+                                    };
+                                    await enqueueCompressionJob(formData, {
+                                        triggerElement: document.getElementById('submitBtn'),
+                                        mode: 'code',
+                                        keepTriggerDisabledOnSuccess: true,
+                                    });
+                                } else {
+                                    await handlePromptCompression();
+                                }
+                            }
+                        });
+                    }
+                    
+                    if (goBackBtn) {
+                        // Remove any existing listeners by cloning the button
+                        const newGoBackBtn = goBackBtn.cloneNode(true);
+                        goBackBtn.parentNode.replaceChild(newGoBackBtn, goBackBtn);
+                        
+                        newGoBackBtn.addEventListener('click', (e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            
+                            // Hide progress view and show form again (without losing data)
+                            document.getElementById('compression-form')?.classList.remove('hidden');
+                            document.getElementById('progress-view')?.classList.add('hidden');
+                            document.getElementById('tokenEstimation')?.classList.add('hidden');
+                            document.getElementById('jobStatus')?.classList.add('hidden');
+                            document.getElementById('results')?.classList.add('hidden');
+                            
+                            // Clear the recommendation display
+                            const recDiv = document.getElementById('recommendation');
+                            if (recDiv) {
+                                recDiv.innerHTML = '';
+                            }
+                            
+                            // Re-enable submit buttons
+                            const submitBtn = document.getElementById('submitBtn');
+                            if (submitBtn) {
+                                submitBtn.disabled = false;
+                                submitBtn.textContent = 'Start Compression';
+                            }
+                            const promptCompressBtn = document.getElementById('promptCompressBtn');
+                            if (promptCompressBtn) {
+                                promptCompressBtn.disabled = false;
+                            }
+                            
+                            // Clear recommendation confirmation and submission context
+                            window.recommendationConfirmed = false;
+                            window.currentRecommendation = null;
+                            window.pendingSubmissionContext = null;
+                            
+                            showToast('Returned to form. Your data is preserved.', 'info', 3000);
+                        });
+                    }
+                }, 0);
+            } else if (zeroFileWarning) {
+                setTimeout(() => {
+                    const goBackBtn = document.getElementById('goBackBtn');
+                    if (goBackBtn) {
+                        const newGoBackBtn = goBackBtn.cloneNode(true);
+                        goBackBtn.parentNode.replaceChild(newGoBackBtn, goBackBtn);
+                        newGoBackBtn.addEventListener('click', (e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            document.getElementById('compression-form')?.classList.remove('hidden');
+                            document.getElementById('tokenEstimation')?.classList.add('hidden');
+                            document.getElementById('progress-view')?.classList.add('hidden');
+                            document.getElementById('jobStatus')?.classList.add('hidden');
+                            document.getElementById('results')?.classList.add('hidden');
+                            showToast('No eligible files were detected. Please adjust your directory or exclusions.', 'error', 4000);
+                        });
+                    }
+                }, 0);
+            }
+        }
+
+        // Display DeepSeek insights
+        function displayDeepSeekInsights(data) {
+            const insights = data.deepseek_insights;
+            const summary = data.summary;
+            const details = data.technical_details;
+
+            // Summary view
+            document.getElementById('summaryRatio').textContent = summary.compression_ratio;
+            document.getElementById('summaryAccuracy').textContent = summary.accuracy;
+            document.getElementById('summaryTime').textContent = summary.estimated_time;
+
+            // Detailed view
+            document.getElementById('detailPages').textContent = details.estimated_pages;
+            document.getElementById('detailTextTokens').textContent = formatTokens(details.text_tokens);
+            document.getElementById('detailVisionTokens').textContent = formatTokens(details.vision_tokens);
+            document.getElementById('detailConversion').textContent = details.conversion_ratio;
+            document.getElementById('detailThroughput').textContent = details.throughput_capacity + '%';
+            document.getElementById('detailModel').textContent = details.model_version;
+        }
+        function sanitizePath(value) {
+            if (typeof value !== 'string') return '';
+            return value.trim().replace(/^['"]|['"]$/g, '');
+        }
+
+        async function downloadFailureReport(jobId) {
+            try {
+                const response = await fetch(`/api/job/${jobId}/failures`);
+                const data = await response.json();
+                if (!response.ok) {
+                    showToast(data.error || 'Failure report not available', 'error');
+                    return;
+                }
+                const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `failure_report_${jobId}.json`;
+                document.body.appendChild(link);
+                link.click();
+                link.remove();
+                URL.revokeObjectURL(url);
+                showToast('Failure report downloaded', 'success');
+            } catch (error) {
+                showToast('Error downloading failure report: ' + error.message, 'error');
+            }
+        }
+
+        function escapeHtml(value) {
+            if (typeof value !== 'string') return '';
+            return value
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        function collectSharedOptions(outputOverride = null) {
+            const resolvedOutput = outputOverride !== null ? outputOverride : sanitizePath(document.getElementById('output_dir').value);
+            return {
+                output_dir: resolvedOutput || null,
+                parallel: document.getElementById('parallel').checked,
+                resume: document.getElementById('resume').checked,
+                ocr_enabled: document.getElementById('ocr_enabled').checked,
+                ocr_mode: document.getElementById('ocr_mode').value,
+                hybrid_mode: document.getElementById('hybrid_mode')?.checked || false,  // HYBRID_MODE_START
+                workers: document.getElementById('workers').value || null,
+                smart_concatenation: document.getElementById('smart_concatenation').checked,
+                max_pdfs: parseInt(document.getElementById('max_pdfs').value, 10) || 10,
+                max_pages_per_pdf: parseInt(document.getElementById('max_pages_per_pdf').value, 10) || 100,
+                max_size_per_pdf_mb: parseFloat(document.getElementById('max_size_per_pdf_mb').value) || 10,
+                max_total_pages: parseInt(document.getElementById('max_total_pages').value, 10) || 1000,
+            };
+        }
+
+        function initializeProgressView(initialLog = 'Job queued. Starting compression...') {
+            document.getElementById('compression-form').classList.add('hidden');
+            document.getElementById('progress-view').classList.remove('hidden');
+            document.getElementById('jobStatus').classList.add('hidden');
+            document.getElementById('results').classList.add('hidden');
+            document.getElementById('progressStatusText').textContent = 'Job queued...';
+            document.getElementById('progressPercentText').textContent = '0%';
+            document.getElementById('progressViewBar').style.width = '0%';
+            document.getElementById('progressLogs').textContent = initialLog;
+        }
+
+        function hydrateEstimateViews(estimates) {
+            if (!estimates) return;
+            currentEstimates = estimates;
+
+            const insightSummary = estimates.deepseek_insights ? {
+                compression_ratio: `${estimates.deepseek_insights.compression_ratio}x`,
+                accuracy: `${estimates.deepseek_insights.accuracy_percent}%`,
+                estimated_time: estimates.deepseek_insights.processing_time_formatted,
+            } : null;
+
+            const insightDetails = estimates.deepseek_insights ? {
+                estimated_pages: estimates.deepseek_insights.estimated_pages,
+                text_tokens: estimates.deepseek_insights.pre_tokens,
+                vision_tokens: estimates.deepseek_insights.vision_tokens_estimate,
+                conversion_ratio: `1k text → ${Math.round(estimates.deepseek_insights.text_to_vision_token_ratio * 1000)} vision`,
+                throughput_capacity: estimates.deepseek_insights.throughput_capacity_percent,
+                model_version: estimates.deepseek_insights.model_version,
+            } : null;
+
+            displayTokenEstimation({
+                pre_compression: estimates.pre_compression,
+                post_compression: estimates.post_compression,
+                recommendation: estimates.recommendation,
+                deepseek_insights: estimates.deepseek_insights,
+                summary: insightSummary,
+                technical_details: insightDetails,
+            });
+
+            if (estimates.deepseek_insights) {
+                displayDeepSeekInsights({
+                    deepseek_insights: estimates.deepseek_insights,
+                    summary: insightSummary,
+                    technical_details: insightDetails,
+                });
+            }
+
+            document.getElementById('tokenEstimation').classList.remove('hidden');
+        }
+
+        async function enqueueCompressionJob(formData, options = {}) {
+            const {
+                triggerElement = null,
+                mode = 'code',
+                keepTriggerDisabledOnSuccess = true,
+            } = options;
+
+            // Store submission context for button handlers
+            window.pendingSubmissionContext = { mode, formData, options };
+
+            // Check for recommendation confirmation if warning/error
+            if (window.currentRecommendation && 
+                (window.currentRecommendation.severity === 'warning' || window.currentRecommendation.severity === 'error') &&
+                !window.recommendationConfirmed) {
+                // Don't proceed - wait for user to click "Proceed Anyway" or "Go Back"
+                return;
+            }
+
+            const petalsCount = mode === 'prompt' ? 25 : 40;
+            createFallingPetals(3000, petalsCount);
+
+            const disableTrigger = () => {
+                if (!triggerElement) return;
+                if (!triggerElement.dataset.originalText) {
+                    triggerElement.dataset.originalText = triggerElement.textContent;
+                }
+                triggerElement.disabled = true;
+                triggerElement.textContent = 'Starting...';
+            };
+
+            const enableTrigger = () => {
+                if (!triggerElement) return;
+                triggerElement.disabled = false;
+                if (triggerElement.dataset.originalText) {
+                    triggerElement.textContent = triggerElement.dataset.originalText;
+                }
+            };
+
+            disableTrigger();
+
+            try {
+                const response = await fetch('/api/compress', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData),
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    currentJobId = data.job_id;
+                    const initialLog = mode === 'prompt'
+                        ? 'Prompt collector job queued. Preparing virtual files...\n'
+                        : 'Job queued. Starting compression...\n';
+                    initializeProgressView(initialLog);
+
+                    if (mode === 'prompt') {
+                        closePromptDrawer(true);
+                    }
+
+                    if (data.estimates) {
+                        hydrateEstimateViews(data.estimates);
+                    }
+
+                    startStatusPolling(currentJobId);
+
+                    if (!keepTriggerDisabledOnSuccess) {
+                        enableTrigger();
+                    }
+                    
+                    // Clear recommendation state after successful submission
+                    window.recommendationConfirmed = false;
+                    window.currentRecommendation = null;
+                    window.pendingSubmissionContext = null;
+                } else {
+                    showToast('Error: ' + (data.error || 'Unknown error'), 'error');
+                    enableTrigger();
+                }
+            } catch (error) {
+                showToast('Error: ' + error.message, 'error');
+                enableTrigger();
+            }
+        }
+
+        function createPromptCard(prompt) {
+            const card = document.createElement('div');
+            card.className = 'prompt-card';
+            card.dataset.promptId = prompt.id;
+
+            const titleInput = document.createElement('input');
+            titleInput.type = 'text';
+            titleInput.value = prompt.name || '';
+            titleInput.placeholder = 'Prompt title';
+            titleInput.addEventListener('input', (event) => {
+                PromptCollectorStore.updatePrompt(prompt.id, { name: event.target.value });
+            });
+
+            const textArea = document.createElement('textarea');
+            textArea.value = prompt.text || '';
+            autoResizeTextarea(textArea);
+            textArea.addEventListener('input', (event) => {
+                PromptCollectorStore.updatePrompt(prompt.id, { text: event.target.value });
+                autoResizeTextarea(event.target);
+            });
+            textArea.addEventListener('blur', (event) => {
+                if (!event.target.value.trim()) {
+                    PromptCollectorStore.removePrompt(prompt.id);
+                }
+            });
+
+            const actions = document.createElement('div');
+            actions.className = 'prompt-card-actions';
+            const deleteBtn = document.createElement('button');
+            deleteBtn.type = 'button';
+            deleteBtn.setAttribute('aria-label', `Remove ${prompt.name || 'prompt'}`);
+            deleteBtn.innerHTML = '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>';
+            deleteBtn.addEventListener('click', () => PromptCollectorStore.removePrompt(prompt.id));
+            actions.appendChild(deleteBtn);
+
+            card.appendChild(actions);
+            card.appendChild(titleInput);
+            card.appendChild(textArea);
+            return card;
+        }
+
+        function renderPromptCollectorUI(prompts = PromptCollectorStore.getPrompts()) {
+            if (!promptList) {
+                return;
+            }
+
+            if (!prompts.length) {
+                promptList.innerHTML = '<div class="text-sm text-gray-500 text-center py-6">No prompts yet. Hover over the + icon to add one.</div>';
+            } else {
+                promptList.innerHTML = '';
+                prompts.forEach(prompt => {
+                    promptList.appendChild(createPromptCard(prompt));
+                });
+            }
+
+            if (promptCollectorCount) {
+                if (prompts.length) {
+                    promptCollectorCount.textContent = prompts.length;
+                    promptCollectorCount.classList.remove('hidden');
+                } else {
+                    promptCollectorCount.classList.add('hidden');
+                }
+            }
+
+            if (promptStats) {
+                if (!prompts.length) {
+                    promptStats.textContent = 'No prompts yet.';
+                } else {
+                    const totalChars = prompts.reduce((sum, prompt) => sum + (prompt.text || '').length, 0);
+                    const approxPages = Math.max(1, Math.ceil(totalChars / 1800));
+                    // Rough token estimation: ~4 characters per token
+                    const approxTokens = Math.round(totalChars / 4);
+                    promptStats.textContent = `${prompts.length} prompt${prompts.length === 1 ? '' : 's'} · ${totalChars.toLocaleString()} chars · ~${formatTokens(approxTokens)} tokens · ~${approxPages} page${approxPages === 1 ? '' : 's'}`;
+                }
+            }
+
+            if (promptCompressBtn) {
+                promptCompressBtn.disabled = prompts.length === 0;
+            }
+            
+            if (promptEstimateBtn) {
+                promptEstimateBtn.disabled = prompts.length === 0;
+            }
+        }
+
+        function openPromptDrawer() {
+            if (!promptDrawer || !promptDrawerBackdrop) return;
+            promptDrawer.classList.add('open');
+            promptDrawer.setAttribute('aria-hidden', 'false');
+            promptDrawerBackdrop.classList.remove('hidden');
+            promptDrawerBackdrop.classList.add('visible');
+        }
+
+        function closePromptDrawer(forceCollapseAdder = false) {
+            if (!promptDrawer || !promptDrawerBackdrop) return;
+            promptDrawer.classList.remove('open');
+            promptDrawer.setAttribute('aria-hidden', 'true');
+            promptDrawerBackdrop.classList.remove('visible');
+            promptDrawerBackdrop.classList.add('hidden');
+            if (forceCollapseAdder) {
+                collapsePromptAdder(true);
+            }
+        }
+
+        let promptAdderHasInput = false;
+
+        function activatePromptAdder() {
+            if (!promptAdder) return;
+            promptAdder.classList.add('active');
+            setTimeout(() => {
+                promptAdderTextarea?.focus();
+            }, 0);
+        }
+
+        function collapsePromptAdder(force = false) {
+            if (!promptAdder) return;
+            if (!promptAdderHasInput || force) {
+                promptAdder.classList.remove('active');
+                if (promptAdderTextarea) {
+                    promptAdderTextarea.value = '';
+                }
+                promptAdderHasInput = false;
+            }
+        }
+
+        async function handlePromptCompression() {
+            const prompts = PromptCollectorStore.getPrompts();
+            if (!prompts.length) {
+                showToast('Add at least one prompt before compressing.', 'warning');
+                return;
+            }
+            
+            // Check for recommendation confirmation if warning/error
+            if (window.currentRecommendation && 
+                (window.currentRecommendation.severity === 'warning' || window.currentRecommendation.severity === 'error') &&
+                !window.recommendationConfirmed) {
+                // Don't proceed - wait for user to click "Proceed Anyway" or "Go Back"
+                showToast('Please review the recommendation above and click "Proceed Anyway" or "Go Back"', 'warning');
+                return;
+            }
+            
+            const outputOverride = sanitizePath(document.getElementById('output_dir').value);
+            const sharedOptions = collectSharedOptions(outputOverride);
+            const payload = prompts.map((prompt, index) => ({
+                id: prompt.id,
+                name: (prompt.name && prompt.name.trim()) ? prompt.name.trim() : `Prompt ${index + 1}`,
+                text: prompt.text || '',
+            }));
+            const formData = {
+                ...sharedOptions,
+                exclusions: '',
+                resume: false,
+                prompt_payload: payload,
+            };
+            
+            // Get estimates first to check for recommendations (unless already confirmed)
+            if (!window.recommendationConfirmed) {
+                try {
+                    promptCompressBtn.disabled = true;
+                    promptCompressBtn.textContent = 'Checking...';
+                    
+                    const estimateResponse = await fetch('/api/estimate', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ prompt_payload: payload }),
+                    });
+                    
+                    const estimateData = await estimateResponse.json();
+                    
+                    if (estimateResponse.ok && estimateData.recommendation) {
+                        // Display estimates and recommendation
+                        currentEstimates = estimateData;
+                        hydrateEstimateViews(estimateData);
+                        document.getElementById('tokenEstimation').classList.remove('hidden');
+                        
+                        // Check if recommendation requires confirmation
+                        if (estimateData.recommendation.severity === 'warning' || estimateData.recommendation.severity === 'error') {
+                            // Store submission context for later
+                            window.pendingSubmissionContext = { mode: 'prompt', formData, payload };
+                            // Don't proceed - wait for user to confirm via "Proceed Anyway" button
+                            promptCompressBtn.disabled = false;
+                            promptCompressBtn.textContent = 'Compress Prompts';
+                            return;
+                        }
+                    }
+                } catch (error) {
+                    showToast('Error: ' + error.message, 'error');
+                    promptCompressBtn.disabled = false;
+                    promptCompressBtn.textContent = 'Compress Prompts';
+                    return;
+                }
+            }
+            
+            // No blocking recommendation or user confirmed, proceed with compression
+            // Store submission context
+            window.pendingSubmissionContext = { mode: 'prompt', formData, payload };
+            await enqueueCompressionJob(formData, {
+                triggerElement: promptCompressBtn,
+                mode: 'prompt',
+                keepTriggerDisabledOnSuccess: true,
+            });
+        }
+
+        function initializePromptCollector() {
+            if (!promptCollectorToggle || !promptDrawer) {
+                return;
+            }
+
+            promptCollectorToggle.addEventListener('click', () => {
+                if (promptDrawer.classList.contains('open')) {
+                    closePromptDrawer();
+                } else {
+                    openPromptDrawer();
+                }
+            });
+
+            document.getElementById('closePromptDrawer')?.addEventListener('click', () => closePromptDrawer(true));
+            promptDrawerBackdrop?.addEventListener('click', () => closePromptDrawer(true));
+            document.addEventListener('keydown', (event) => {
+                if (event.key === 'Escape' && promptDrawer.classList.contains('open')) {
+                    closePromptDrawer(true);
+                }
+            });
+
+            if (promptClearBtn) {
+                promptClearBtn.addEventListener('click', () => {
+                    if (!PromptCollectorStore.getPrompts().length) {
+                        return;
+                    }
+                    PromptCollectorStore.clear();
+                    showToast('Cleared all prompts.', 'info', 2500);
+                });
+            }
+
+            promptCompressBtn?.addEventListener('click', handlePromptCompression);
+            
+            if (promptEstimateBtn) {
+                promptEstimateBtn.addEventListener('click', async () => {
+                    const prompts = PromptCollectorStore.getPrompts();
+                    if (!prompts.length) {
+                        showToast('Add at least one prompt before estimating.', 'warning');
+                        return;
+                    }
+                    
+                    promptEstimateBtn.disabled = true;
+                    promptEstimateBtn.textContent = 'Estimating...';
+                    
+                    try {
+                        const payload = prompts.map((prompt, index) => ({
+                            id: prompt.id,
+                            name: (prompt.name && prompt.name.trim()) ? prompt.name.trim() : `Prompt ${index + 1}`,
+                            text: prompt.text || '',
+                        }));
+                        
+                        const response = await fetch('/api/estimate', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({ prompt_payload: payload }),
+                        });
+                        
+                        const data = await response.json();
+                        
+                        if (response.ok) {
+                            currentEstimates = data;
+                            hydrateEstimateViews(data);
+                            // Close drawer first to avoid visual glitch, then show estimation
+                            if (promptDrawer && promptDrawer.classList.contains('open')) {
+                                closePromptDrawer(true);
+                                // Wait for drawer animation to complete (300ms) plus a small buffer
+                                setTimeout(() => {
+                                    const tokenEstimation = document.getElementById('tokenEstimation');
+                                    if (tokenEstimation) {
+                                        tokenEstimation.classList.remove('hidden');
+                                        // Scroll to estimation panel after a brief moment
+                                        setTimeout(() => {
+                                            tokenEstimation.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                                        }, 100);
+                                    }
+                                }, 400);
+                            } else {
+                                // Drawer already closed, show immediately
+                                const tokenEstimation = document.getElementById('tokenEstimation');
+                                if (tokenEstimation) {
+                                    tokenEstimation.classList.remove('hidden');
+                                    tokenEstimation.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                                }
+                            }
+                            showToast('Token estimation complete!', 'success', 3000);
+                        } else {
+                            showToast('Error: ' + (data.error || 'Unknown error'), 'error');
+                        }
+                    } catch (error) {
+                        showToast('Error: ' + error.message, 'error');
+                    } finally {
+                        promptEstimateBtn.disabled = false;
+                        promptEstimateBtn.textContent = 'Estimate Tokens';
+                    }
+                });
+            }
+
+            if (promptAdder) {
+                promptAdder.addEventListener('mouseenter', activatePromptAdder);
+                promptAdder.addEventListener('mouseleave', () => {
+                    if (!promptAdderHasInput) {
+                        collapsePromptAdder();
+                    }
+                });
+                promptAdder.addEventListener('focus', activatePromptAdder);
+            }
+
+            promptAdderButton?.addEventListener('click', activatePromptAdder);
+
+            if (promptAdderTextarea) {
+                promptAdderTextarea.addEventListener('input', () => {
+                    promptAdderHasInput = !!promptAdderTextarea.value.trim();
+                });
+                promptAdderTextarea.addEventListener('blur', () => {
+                    const text = promptAdderTextarea.value.trim();
+                    if (text) {
+                        PromptCollectorStore.addPrompt(text);
+                    }
+                    promptAdderTextarea.value = '';
+                    promptAdderHasInput = false;
+                    collapsePromptAdder(true);
+                });
+                promptAdderTextarea.addEventListener('keydown', (event) => {
+                    if (event.key === 'Escape') {
+                        promptAdderTextarea.value = '';
+                        promptAdderHasInput = false;
+                        collapsePromptAdder(true);
+                    }
+                });
+            }
+
+            PromptCollectorStore.subscribe(renderPromptCollectorUI);
+            renderPromptCollectorUI();
+        }
+
+        // Toggle insights panel
+        document.getElementById('insightsToggle').addEventListener('click', function() {
+            const details = document.getElementById('insightsDetails');
+            const iconSvg = document.getElementById('insightsToggleIconSvg');
+            
+            details.classList.toggle('expanded');
+            if (details.classList.contains('expanded')) {
+                iconSvg.setAttribute('d', 'M5 15l7-7 7 7');
+            } else {
+                iconSvg.setAttribute('d', 'M19 9l-7 7-7-7');
+            }
+        });
+
+        // Tooltip functionality
+        let activeTooltip = null;
+        let tooltipTimeout = null;
+
+        function showTooltip(tooltipId, iconElement) {
+            // Hide any existing tooltip
+            hideTooltip();
+
+            const tooltip = document.getElementById(`tooltip-${tooltipId}`);
+            if (!tooltip) return;
+
+            // Position tooltip relative to icon using fixed positioning
+            const rect = iconElement.getBoundingClientRect();
+            
+            // Position tooltip below icon, centered horizontally
+            // Use fixed positioning relative to viewport
+            let leftPos = rect.left + (rect.width / 2) - 160; // Center on icon (tooltip max-width 320px)
+            let topPos = rect.bottom + 8; // 8px below icon
+            
+            tooltip.style.position = 'fixed';
+            tooltip.style.left = leftPos + 'px';
+            tooltip.style.top = topPos + 'px';
+            
+            // Show tooltip first to get its dimensions
+            tooltip.classList.add('visible');
+            activeTooltip = tooltip;
+            
+            // Adjust if tooltip goes off screen (after showing to get dimensions)
+            setTimeout(() => {
+                const tooltipRect = tooltip.getBoundingClientRect();
+                // Adjust horizontal position if needed
+                if (tooltipRect.right > window.innerWidth) {
+                    tooltip.style.left = (window.innerWidth - tooltipRect.width - 10) + 'px';
+                }
+                if (tooltipRect.left < 0) {
+                    tooltip.style.left = '10px';
+                }
+                // Adjust vertical position if tooltip goes below viewport
+                if (tooltipRect.bottom > window.innerHeight) {
+                    // Position above icon instead
+                    tooltip.style.top = (rect.top - tooltipRect.height - 8) + 'px';
+                    // Update arrow position
+                    tooltip.style.setProperty('--arrow-top', 'auto');
+                    tooltip.style.setProperty('--arrow-bottom', '-12px');
+                }
+            }, 0);
+        }
+
+        function hideTooltip() {
+            if (activeTooltip) {
+                activeTooltip.classList.remove('visible');
+                activeTooltip = null;
+            }
+            if (tooltipTimeout) {
+                clearTimeout(tooltipTimeout);
+                tooltipTimeout = null;
+            }
+        }
+
+        // Setup tooltip icons
+        document.querySelectorAll('.tooltip-icon').forEach(icon => {
+            const tooltipId = icon.getAttribute('data-tooltip');
+            
+            // Hover events (fade in/out)
+            icon.addEventListener('mouseenter', function() {
+                if (!icon.classList.contains('clicked')) {
+                    showTooltip(tooltipId, icon);
+                }
+            });
+
+            icon.addEventListener('mouseleave', function() {
+                if (!icon.classList.contains('clicked')) {
+                    hideTooltip();
+                }
+            });
+
+            // Click events (stay for 30 seconds or until click anywhere)
+            icon.addEventListener('click', function(e) {
+                e.stopPropagation();
+                icon.classList.add('clicked');
+                
+                if (activeTooltip && activeTooltip.id === `tooltip-${tooltipId}`) {
+                    // Already showing, hide it
+                    icon.classList.remove('clicked');
+                    hideTooltip();
+                } else {
+                    // Show and set timeout
+                    showTooltip(tooltipId, icon);
+                    tooltipTimeout = setTimeout(() => {
+                        icon.classList.remove('clicked');
+                        hideTooltip();
+                    }, 30000); // 30 seconds
+                }
+            });
+        });
+
+        // Click anywhere to close clicked tooltips
+        document.addEventListener('click', function(e) {
+            if (activeTooltip && !e.target.closest('.tooltip-icon') && !e.target.closest('.tooltip')) {
+                document.querySelectorAll('.tooltip-icon.clicked').forEach(icon => {
+                    icon.classList.remove('clicked');
+                });
+                hideTooltip();
+            }
+        });
+
+        // Handle form submission
+        document.getElementById('compressForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const submitBtn = document.getElementById('submitBtn');
+            const sourceDir = sanitizePath(document.getElementById('source_dir').value);
+            if (!sourceDir) {
+                showToast('Please enter a source directory first', 'warning');
+                return;
+            }
+            
+            // Check for recommendation confirmation if warning/error
+            if (window.currentRecommendation && 
+                (window.currentRecommendation.severity === 'warning' || window.currentRecommendation.severity === 'error') &&
+                !window.recommendationConfirmed) {
+                // Don't proceed - wait for user to click "Proceed Anyway" or "Go Back"
+                showToast('Please review the recommendation above and click "Proceed Anyway" or "Go Back"', 'warning');
+                return;
+            }
+            
+            const exclusions = document.getElementById('exclusions').value;
+            const sharedOptions = collectSharedOptions();
+            const formData = {
+                ...sharedOptions,
+                source_dir: sourceDir,
+                exclusions,
+            };
+            await enqueueCompressionJob(formData, {
+                triggerElement: submitBtn,
+                mode: 'code',
+                keepTriggerDisabledOnSuccess: true,
+            });
+        });
+
+        // Poll job status
+        function startStatusPolling(jobId) {
+            if (statusInterval) {
+                clearInterval(statusInterval);
+            }
+
+            statusInterval = setInterval(async () => {
+                try {
+                    const response = await fetch(`/api/job/${jobId}`);
+                    const job = await response.json();
+
+                    updateJobStatus(job);
+                    updateProgressView(job);
+
+                    if (job.status === 'completed' || job.status === 'failed') {
+                        clearInterval(statusInterval);
+                        if (job.status === 'completed') {
+                            showResults(job);
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error polling status:', error);
+                }
+            }, 1000);
+        }
+
+        // Update job status display
+        function updateJobStatus(job) {
+            document.getElementById('statusText').textContent = job.status.charAt(0).toUpperCase() + job.status.slice(1);
+            document.getElementById('progressText').textContent = job.progress + '%';
+            document.getElementById('progressBar').style.width = job.progress + '%';
+            document.getElementById('statusMessage').textContent = job.message || '';
+
+            const progressBar = document.getElementById('progressBar');
+            if (job.status === 'completed') {
+                progressBar.classList.remove('sakura-progress');
+                progressBar.style.background = 'linear-gradient(90deg, #16A34A, #22C55E)';
+            } else if (job.status === 'failed') {
+                progressBar.classList.remove('sakura-progress');
+                progressBar.style.background = 'linear-gradient(90deg, #EF4444, #DC2626)';
+            }
+        }
+
+        // Update progress view
+        function updateProgressView(job) {
+            const statusText = job.status.charAt(0).toUpperCase() + job.status.slice(1);
+            document.getElementById('progressStatusText').textContent = job.message || statusText;
+            document.getElementById('progressPercentText').textContent = job.progress + '%';
+            document.getElementById('progressViewBar').style.width = job.progress + '%';
+            
+            // Update logs
+            const logsElement = document.getElementById('progressLogs');
+            const timestamp = new Date().toLocaleTimeString();
+            const logMessage = `[${timestamp}] ${job.message || statusText}\n`;
+            logsElement.textContent += logMessage;
+            logsElement.scrollTop = logsElement.scrollHeight; // Auto-scroll to bottom
+            
+            // Update progress bar color
+            const progressBar = document.getElementById('progressViewBar');
+            if (job.status === 'completed') {
+                progressBar.classList.remove('sakura-progress');
+                progressBar.style.background = 'linear-gradient(90deg, #16A34A, #22C55E)';
+            } else if (job.status === 'failed') {
+                progressBar.classList.remove('sakura-progress');
+                progressBar.style.background = 'linear-gradient(90deg, #EF4444, #DC2626)';
+            }
+        }
+
+        // Show results
+        function showResults(job) {
+            const results = job.results;
+            if (!results) return;
+            const resultsContent = document.getElementById('resultsContent');
+            const summary = results.summary;
+            const discoveryTotal = results.discovery?.statistics?.total_files ?? 0;
+            const filesDiscovered = summary?.files_discovered ?? discoveryTotal;
+            const filesConverted = summary?.files_converted ?? 0;
+            const duration = typeof results.duration_seconds === 'number'
+                ? `${results.duration_seconds.toFixed(2)}s`
+                : '—';
+            const ratioValue = summary?.compression_ratio ?? results.conversion?.compression_ratio;
+            const ratioText = typeof ratioValue === 'number' ? `${ratioValue.toFixed(2)}x` : '—';
+            const errorMessage = results.error || (results.success === false ? 'Compression failed. See logs for details.' : null);
+
+            let summaryHtml = '';
+            if (summary) {
+                summaryHtml = `
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <p class="text-sm text-gray-600">Files Discovered</p>
+                            <p class="text-2xl font-bold">${filesDiscovered}</p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-600">Files Converted</p>
+                            <p class="text-2xl font-bold">${filesConverted}</p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-600">Duration</p>
+                            <p class="text-lg font-semibold">${duration}</p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-600">Compression Ratio</p>
+                            <p class="text-lg font-semibold">${ratioText}</p>
+                        </div>
+                    </div>
+                `;
+            } else {
+                summaryHtml = `
+                    <div class="rounded-xl bg-red-50 border border-red-200 p-4 text-red-700">
+                        <p class="font-semibold mb-1">Summary unavailable</p>
+                        <p class="text-sm">${errorMessage || 'This job did not produce a detailed summary. Please review the input and try again.'}</p>
+                        <p class="text-xs text-red-500 mt-2">Files discovered: ${filesDiscovered}</p>
+                    </div>
+                `;
+            }
+
+            const failures = results.failed_files || [];
+            const conversionErrors = (results.conversion && results.conversion.errors) || [];
+            const hasFailures = failures.length > 0 || conversionErrors.length > 0;
+            let failureHtml = '';
+            if (hasFailures) {
+                let failureItems = '';
+                failures.slice(0, 5).forEach((failure) => {
+                    const fileName = escapeHtml(failure.file || 'unknown file');
+                    const message = escapeHtml(failure.error || failure.warning || 'Unknown error');
+                    failureItems += `<li class="mb-1"><span class="font-semibold">${fileName}</span> — ${message}</li>`;
+                });
+                if (failures.length > 5) {
+                    failureItems += `<li class="text-xs text-red-500">…and ${failures.length - 5} more failures</li>`;
+                }
+                conversionErrors.slice(0, 3).forEach((err) => {
+                    const warn = escapeHtml(err.warning || err.error || JSON.stringify(err));
+                    failureItems += `<li class="mb-1 text-yellow-800">Warning: ${warn}</li>`;
+                });
+                if (conversionErrors.length > 3) {
+                    failureItems += `<li class="text-xs text-yellow-700">…and ${conversionErrors.length - 3} more conversion warnings</li>`;
+                }
+                const jobIdSafe = (job.id || '').replace(/'/g, "\\'");
+                const downloadButton = results.failure_report
+                    ? `<button class="px-4 py-2 rounded-lg text-sm font-medium bg-white text-red-700 border border-red-200 hover:bg-red-100 transition"
+                                onclick="downloadFailureReport('${jobIdSafe}')">
+                            Download Failure Report
+                       </button>`
+                    : '';
+                const telemetryInfo = results.telemetry_log
+                    ? `<p class="text-xs text-gray-600 mt-3">Telemetry log: ${escapeHtml(results.telemetry_log)}</p>`
+                    : '';
+                
+                failureHtml = `
+                    <div class="mt-4 border border-red-200 bg-red-50 text-red-800 rounded-xl p-4">
+                        <div class="flex items-center justify-between flex-wrap gap-2">
+                            <div>
+                                <p class="font-semibold">Completed with errors</p>
+                                <p class="text-sm text-red-700">Some files could not be processed. Review the details below.</p>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                ${downloadButton}
+                            </div>
+                        </div>
+                        <ul class="mt-3 text-sm list-disc list-inside">
+                            ${failureItems || '<li>No additional details available.</li>'}
+                        </ul>
+                        ${telemetryInfo}
+                    </div>
+                `;
+            }
+
+            resultsContent.innerHTML = summaryHtml + failureHtml;
+
+            document.getElementById('results').classList.remove('hidden');
+            document.getElementById('newJobBtn').onclick = () => {
+                // Reset to home page - show form, hide results and progress
+                document.getElementById('compression-form').classList.remove('hidden');
+                document.getElementById('results').classList.add('hidden');
+                document.getElementById('progress-view').classList.add('hidden');
+                document.getElementById('jobStatus').classList.add('hidden');
+                document.getElementById('tokenEstimation').classList.add('hidden');
+                
+                // Scroll to top
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            };
+        }
+
+        // Format date for display
+        function formatDate(dateString) {
+            try {
+                const date = new Date(dateString);
+                return date.toLocaleString();
+            } catch (e) {
+                return dateString;
+            }
+        }
+
+        // Format job name (shortened ID)
+        function formatJobName(jobId) {
+            // Extract meaningful part: job_1_1234567890 -> Job #1
+            const match = jobId.match(/job_(\d+)_/);
+            if (match) {
+                return `Job #${match[1]}`;
+            }
+            return jobId.substring(0, 20) + '...';
+        }
+
+        // Open folder handler
+        async function openFolder(outputDir) {
+            try {
+                const response = await fetch('/api/open-folder', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ path: outputDir }),
+                });
+
+                const data = await response.json();
+                if (!response.ok) {
+                    showToast('Error: ' + (data.error || 'Could not open folder'), 'error');
+                }
+            } catch (error) {
+                showToast('Error: ' + error.message, 'error');
+            }
+        }
+
+        // Load job history on page load
+        async function loadJobHistory() {
+            try {
+                const response = await fetch('/api/jobs');
+                const data = await response.json();
+                
+                const tbody = document.getElementById('job-history-table-body');
+                if (data.jobs.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="5" class="px-4 py-4 text-center text-gray-500 text-sm">No jobs yet</td></tr>';
+                } else {
+                    tbody.innerHTML = data.jobs.map(job => {
+                        const statusClass = job.status === 'completed' ? 'bg-green-100 text-green-800' :
+                                          job.status === 'failed' ? 'bg-red-100 text-red-800' :
+                                          job.status === 'running' ? 'bg-blue-100 text-blue-800' :
+                                          'bg-gray-100 text-gray-800';
+                        
+                        const actionsHtml = job.status === 'completed' && job.output_dir ? 
+                            `<button onclick="openFolder('${job.output_dir.replace(/'/g, "\\'")}')" class="px-3 py-1 text-white text-xs rounded-xl transition-all duration-200 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-1" style="background: linear-gradient(135deg, var(--sakura-accent), var(--sakura-blossom));" aria-label="Open output folder for ${formatJobName(job.id)}" type="button">Open Folder</button>` :
+                            '<span class="text-gray-400 text-xs">-</span>';
+                        
+                        const modeLabel = job.mode === 'prompt' ? 'Prompt Collector' : 'Codebase';
+                        return `
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-4 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                <div class="flex flex-col">
+                                    <span>${formatJobName(job.id)}</span>
+                                    <span class="text-xs text-gray-500">${modeLabel}</span>
+                                </div>
+                            </td>
+                            <td class="px-4 py-4 whitespace-nowrap">
+                                <span class="px-2 py-1 text-xs font-semibold rounded ${statusClass}">${job.status}</span>
+                            </td>
+                            <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500">${formatDate(job.created_at)}</td>
+                            <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
+                                <div class="w-full bg-gray-200 rounded-full h-2">
+                                    <div class="sakura-progress h-2 rounded-full" style="width: ${job.progress || 0}%"></div>
+                                </div>
+                                <span class="text-xs text-gray-600 mt-1 block">${job.progress || 0}%</span>
+                            </td>
+                            <td class="px-4 py-4 whitespace-nowrap text-sm">${actionsHtml}</td>
+                        </tr>
+                        `;
+                    }).join('');
+                }
+            } catch (error) {
+                console.error('Error loading job history:', error);
+            }
+        }
+
+        // Make helpers available globally
+        window.openFolder = openFolder;
+        window.downloadFailureReport = downloadFailureReport;
+
+        loadJobHistory();
+        setInterval(loadJobHistory, 5000); // Refresh every 5 seconds
+        initializePromptCollector();
+    </script>
+</body>
+</html>
+

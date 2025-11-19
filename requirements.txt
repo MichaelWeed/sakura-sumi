@@ -1,0 +1,15 @@
+# Core dependencies for OCR compression system
+reportlab>=4.0.0
+pyyaml>=6.0.0
+pillow>=10.0.0
+tqdm>=4.65.0
+flask>=3.0.0
+tiktoken>=0.10.0
+matplotlib>=3.7.0
+pytest>=7.4.0
+pytest-cov>=4.0.0
+
+# Optional: DeepSeek-OCR dependencies (install separately if needed)
+# vllm>=0.2.0
+# transformers>=4.30.0
+
