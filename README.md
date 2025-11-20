@@ -169,6 +169,29 @@ python scripts/run_web.py
 
 **For Advanced Users:** The web portal exposes all CLI features through a GUI, including parallel processing, resume capability, and OCR compression modes.
 
+### Docker (Zero-Setup Option)
+
+Don't want to install Python locally? Use the provided Docker setup.
+
+```bash
+# Build the image
+docker build -t sakura-sumi .
+
+# Run the web portal (maps port 5001 and persists build artifacts)
+docker run --rm -p 5001:5001 \
+  -v "$(pwd)/build:/app/build" \
+  -v "$(pwd)/output:/app/output" \
+  sakura-sumi
+```
+
+Or use docker-compose for one-command startup:
+
+```bash
+docker compose up --build
+```
+
+The compose file mounts `./build` (job history) and `./output` (compression results) so they persist on your host machine. Set `FLASK_SECRET_KEY` or `SAKURA_TELEMETRY` in your `.env` or shell to override the defaults.
+
 ### Prompt Collector (Web Portal Feature)
 
 **What it does:** Compress long-form text prompts without needing a directory structure.
