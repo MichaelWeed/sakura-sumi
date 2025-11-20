@@ -44,7 +44,11 @@ class FileDiscovery:
         '.html', '.htm', '.xhtml', '.md', '.markdown', '.txt',
     }
     
-    ALL_EXTENSIONS = SOURCE_EXTENSIONS | CONFIG_EXTENSIONS | STYLE_EXTENSIONS | MARKUP_EXTENSIONS
+    DOCUMENT_EXTENSIONS = {
+        '.docx',  # Microsoft Word documents (text extraction supported)
+    }
+    
+    ALL_EXTENSIONS = SOURCE_EXTENSIONS | CONFIG_EXTENSIONS | STYLE_EXTENSIONS | MARKUP_EXTENSIONS | DOCUMENT_EXTENSIONS
     
     # Default exclusion patterns
     DEFAULT_EXCLUSIONS = {
@@ -163,6 +167,8 @@ class FileDiscovery:
             if path.name.lower() in ('readme.md', 'readme.txt', 'license', 'changelog'):
                 return 'documentation'
             return 'markup'
+        elif ext in self.DOCUMENT_EXTENSIONS:
+            return 'documentation'
         else:
             return 'other'
     
@@ -192,6 +198,8 @@ class FileDiscovery:
             'by_type': {},
             'by_category': {},
             'total_size': 0,
+            'unsupported_files': {},  # Track unsupported file types
+            'total_scanned': 0,  # Total files encountered (including unsupported)
         }
         
         for root, dirs, files in os.walk(self.source_dir):
@@ -200,13 +208,26 @@ class FileDiscovery:
             
             for file in files:
                 file_path = Path(root) / file
+                self.stats['total_scanned'] += 1
+                
+                # Track unsupported extensions BEFORE checking exclusions
+                # (so we can report what file types were found, even if excluded)
+                file_ext = file_path.suffix.lower()
                 
                 # Skip excluded files
                 if self._should_exclude(file_path):
+                    # Still track unsupported extensions even if excluded
+                    if file_ext and file_ext not in self.ALL_EXTENSIONS:
+                        if file_ext not in self.stats['unsupported_files']:
+                            self.stats['unsupported_files'][file_ext] = 0
+                        self.stats['unsupported_files'][file_ext] += 1
                     continue
                 
-                # Skip if not a supported extension
-                if file_path.suffix.lower() not in self.ALL_EXTENSIONS:
+                # Track unsupported extensions (not excluded, but not supported either)
+                if file_ext and file_ext not in self.ALL_EXTENSIONS:
+                    if file_ext not in self.stats['unsupported_files']:
+                        self.stats['unsupported_files'][file_ext] = 0
+                    self.stats['unsupported_files'][file_ext] += 1
                     continue
                 
                 try:
@@ -291,22 +312,37 @@ class FileDiscovery:
         print(f"File Discovery Summary")
         print(f"{'='*60}")
         print(f"Source Directory: {self.source_dir}")
+        print(f"Total Files Scanned: {self.stats.get('total_scanned', 0)}")
         print(f"Total Files Found: {self.stats['total_files']}")
         print(f"Total Size: {self._format_size(self.stats['total_size'])}")
-        print(f"\nBreakdown by Category:")
-        for category, count in sorted(
-            self.stats['by_category'].items(),
-            key=lambda x: x[1],
-            reverse=True
-        ):
-            print(f"  {category:15s}: {count:4d} files")
-        print(f"\nBreakdown by Type:")
-        for file_type, count in sorted(
-            self.stats['by_type'].items(),
-            key=lambda x: x[1],
-            reverse=True
-        )[:10]:  # Top 10
-            print(f"  .{file_type:10s}: {count:4d} files")
+        
+        # Show unsupported files if any
+        unsupported = self.stats.get('unsupported_files', {})
+        if unsupported:
+            print(f"\n⚠️  Unsupported File Types Found:")
+            for ext, count in sorted(unsupported.items(), key=lambda x: x[1], reverse=True):
+                ext_display = ext if ext else '(no extension)'
+                print(f"  {ext_display:15s}: {count:4d} file(s)")
+            print(f"\n💡 Tip: Sakura Sumi only processes text-based source code files.")
+            print(f"   See https://github.com/MichaelWeed/sakura-sumi#file-type-support for supported types.")
+        
+        if self.stats['by_category']:
+            print(f"\nBreakdown by Category:")
+            for category, count in sorted(
+                self.stats['by_category'].items(),
+                key=lambda x: x[1],
+                reverse=True
+            ):
+                print(f"  {category:15s}: {count:4d} files")
+        
+        if self.stats['by_type']:
+            print(f"\nBreakdown by Type:")
+            for file_type, count in sorted(
+                self.stats['by_type'].items(),
+                key=lambda x: x[1],
+                reverse=True
+            )[:10]:  # Top 10
+                print(f"  .{file_type:10s}: {count:4d} files")
         print(f"{'='*60}\n")
     
     @staticmethod

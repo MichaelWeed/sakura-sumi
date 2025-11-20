@@ -2498,6 +2498,10 @@ dist/</textarea>
             const ratioValue = summary?.compression_ratio ?? results.conversion?.compression_ratio;
             const ratioText = typeof ratioValue === 'number' ? `${ratioValue.toFixed(2)}x` : '—';
             const errorMessage = results.error || (results.success === false ? 'Compression failed. See logs for details.' : null);
+            const discoveryStats = results.discovery?.statistics || {};
+            const unsupportedFiles = discoveryStats.unsupported_files || {};
+            const totalScanned = discoveryStats.total_scanned || 0;
+            const hasUnsupportedFiles = Object.keys(unsupportedFiles).length > 0;
 
             let summaryHtml = '';
             if (summary) {
@@ -2522,11 +2526,35 @@ dist/</textarea>
                     </div>
                 `;
             } else {
+                let unsupportedInfo = '';
+                if (hasUnsupportedFiles) {
+                    const unsupportedList = Object.entries(unsupportedFiles)
+                        .sort((a, b) => b[1] - a[1])
+                        .slice(0, 5)
+                        .map(([ext, count]) => `${ext || '(no extension)'} (${count})`)
+                        .join(', ');
+                    const moreCount = Object.keys(unsupportedFiles).length - 5;
+                    const fullList = moreCount > 0 ? `${unsupportedList}, and ${moreCount} more` : unsupportedList;
+                    unsupportedInfo = `
+                        <div class="mt-3 pt-3 border-t border-red-300">
+                            <p class="text-xs font-semibold mb-1">Unsupported File Types Found:</p>
+                            <p class="text-xs text-red-600">${fullList}</p>
+                            <p class="text-xs text-red-500 mt-2">
+                                💡 Sakura Sumi only processes text-based source code files. 
+                                <a href="https://github.com/MichaelWeed/sakura-sumi#file-type-support" 
+                                   target="_blank" 
+                                   class="underline hover:text-red-700">See supported file types</a>
+                            </p>
+                        </div>
+                    `;
+                }
+                
                 summaryHtml = `
                     <div class="rounded-xl bg-red-50 border border-red-200 p-4 text-red-700">
                         <p class="font-semibold mb-1">Summary unavailable</p>
                         <p class="text-sm">${errorMessage || 'This job did not produce a detailed summary. Please review the input and try again.'}</p>
-                        <p class="text-xs text-red-500 mt-2">Files discovered: ${filesDiscovered}</p>
+                        <p class="text-xs text-red-500 mt-2">Files discovered: ${filesDiscovered}${totalScanned > 0 ? ` (${totalScanned} total scanned)` : ''}</p>
+                        ${unsupportedInfo}
                     </div>
                 `;
             }
