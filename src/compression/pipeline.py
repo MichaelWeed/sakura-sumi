@@ -282,15 +282,48 @@ class CompressionPipeline:
             self.discovery.print_summary()
         
         if not files:
+            discovery_stats = self.discovery.generate_inventory_report()
+            unsupported = discovery_stats.get('statistics', {}).get('unsupported_files', {})
+            total_scanned = discovery_stats.get('statistics', {}).get('total_scanned', 0)
+            
+            # Build detailed error message
+            if unsupported:
+                unsupported_list = ', '.join(f"{ext} ({count})" for ext, count in sorted(
+                    unsupported.items(), key=lambda x: x[1], reverse=True
+                )[:5])  # Show top 5
+                if len(unsupported) > 5:
+                    unsupported_list += f" and {len(unsupported) - 5} more"
+                error_message = (
+                    f"No supported files discovered. Found {total_scanned} file(s) total, "
+                    f"but they are unsupported types: {unsupported_list}. "
+                    f"Sakura Sumi only processes text-based source code files. "
+                    f"See https://github.com/MichaelWeed/sakura-sumi#file-type-support for supported types."
+                )
+            else:
+                error_message = (
+                    "No files discovered in the specified directory. "
+                    "Please ensure the directory contains supported source code files. "
+                    f"See https://github.com/MichaelWeed/sakura-sumi#file-type-support for supported types."
+                )
+            
             if verbose:
                 print("No files found to process!")
-            discovery_stats = self.discovery.generate_inventory_report()
+                if unsupported:
+                    print(f"\n⚠️  Found {total_scanned} file(s) but none are supported types.")
+                    print(f"   Unsupported file types: {', '.join(sorted(unsupported.keys()))}")
+                    print("   💡 Tip: Sakura Sumi only processes text-based source code files.")
+                    print("      See README.md for a complete list of supported file types.")
+            
             failure_results = self._build_failure_result(
-                error_message='No files discovered',
+                error_message=error_message,
                 discovery_stats=discovery_stats,
                 duration_seconds=(datetime.now() - self.start_time).total_seconds(),
             )
-            self._emit_telemetry('pipeline_run', failure_results, {'reason': 'no_files'})
+            self._emit_telemetry('pipeline_run', failure_results, {
+                'reason': 'no_files',
+                'total_scanned': total_scanned,
+                'unsupported_types': list(unsupported.keys()) if unsupported else []
+            })
             return failure_results
         
         # Step 2: Convert files to PDFs
@@ -511,15 +544,48 @@ class CompressionPipeline:
             self.discovery.print_summary()
         
         if not files:
+            discovery_stats = self.discovery.generate_inventory_report()
+            unsupported = discovery_stats.get('statistics', {}).get('unsupported_files', {})
+            total_scanned = discovery_stats.get('statistics', {}).get('total_scanned', 0)
+            
+            # Build detailed error message
+            if unsupported:
+                unsupported_list = ', '.join(f"{ext} ({count})" for ext, count in sorted(
+                    unsupported.items(), key=lambda x: x[1], reverse=True
+                )[:5])  # Show top 5
+                if len(unsupported) > 5:
+                    unsupported_list += f" and {len(unsupported) - 5} more"
+                error_message = (
+                    f"No supported files discovered. Found {total_scanned} file(s) total, "
+                    f"but they are unsupported types: {unsupported_list}. "
+                    f"Sakura Sumi only processes text-based source code files. "
+                    f"See https://github.com/MichaelWeed/sakura-sumi#file-type-support for supported types."
+                )
+            else:
+                error_message = (
+                    "No files discovered in the specified directory. "
+                    "Please ensure the directory contains supported source code files. "
+                    f"See https://github.com/MichaelWeed/sakura-sumi#file-type-support for supported types."
+                )
+            
             if verbose:
                 print("No files found to process!")
-            discovery_stats = self.discovery.generate_inventory_report()
+                if unsupported:
+                    print(f"\n⚠️  Found {total_scanned} file(s) but none are supported types.")
+                    print(f"   Unsupported file types: {', '.join(sorted(unsupported.keys()))}")
+                    print("   💡 Tip: Sakura Sumi only processes text-based source code files.")
+                    print("      See README.md for a complete list of supported file types.")
+            
             failure_results = self._build_failure_result(
-                error_message='No files discovered',
+                error_message=error_message,
                 discovery_stats=discovery_stats,
                 duration_seconds=(datetime.now() - self.start_time).total_seconds(),
             )
-            self._emit_telemetry('pipeline_smart_concatenation', failure_results, {'reason': 'no_files'})
+            self._emit_telemetry('pipeline_smart_concatenation', failure_results, {
+                'reason': 'no_files',
+                'total_scanned': total_scanned,
+                'unsupported_types': list(unsupported.keys()) if unsupported else []
+            })
             return failure_results
         
         # Step 2: Group files using smart concatenation

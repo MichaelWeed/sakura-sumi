@@ -41,12 +41,15 @@ Sakura Sumi uses a **whitelist approach** - only text-based files with supported
 **Markup & Documentation:**
 - `.html`, `.htm`, `.xhtml`, `.md`, `.markdown`, `.txt`
 
+**Document Formats:**
+- `.docx` - Microsoft Word documents (text extraction supported)
+
 ### Automatically Excluded
 
 The following are **automatically excluded** and will not be processed:
 
 - **Binary files**: Any file without a supported extension (images, executables, archives, etc.)
-  - Examples: `.jpg`, `.png`, `.pdf`, `.exe`, `.dll`, `.so`, `.zip`, `.tar`, `.docx`, `.xlsx`
+  - Examples: `.jpg`, `.png`, `.pdf`, `.exe`, `.dll`, `.so`, `.zip`, `.tar`, `.xlsx`
 - **Build artifacts**: `node_modules`, `dist`, `build`, `out`, `bin`, `obj`
 - **Version control**: `.git`, `.svn`, `.hg`
 - **Cache directories**: `__pycache__`, `.pytest_cache`, `.mypy_cache`, `.next`, `.nuxt`

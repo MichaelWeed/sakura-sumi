@@ -1,0 +1,105 @@
+# Central Registry of Documentation Files
+# Last Updated: 2025-01-15
+
+canonical_notes:
+  - path: ".meta/CANON.md"
+    status: "active"
+    category: "immutable_codex"
+    last_updated: "2025-01-15"
+    last_reviewed: "2025-01-15"
+    summary: "Immutable codex of finalized edicts, rules, and architecture specifications"
+
+  - path: ".meta/NOTES.MD"
+    status: "active"
+    category: "high_level_overview"
+    last_updated: "2025-01-15"
+    last_reviewed: "2025-01-15"
+    summary: "High-level project overview, setup instructions, current status, architecture highlights"
+
+  - path: "docs/design/PROJECT_DESIGN_RULEBOOK.md"
+    status: "active"
+    category: "design_ssot"
+    last_updated: "2025-01-15"
+    last_reviewed: "2025-01-15"
+    summary: "Single source of truth (SSOT) for all frontend design, styling, and UI implementation. All design specifications migrated and active."
+
+  - path: "docs/developer/DEVELOPER.md"
+    status: "active"
+    category: "developer_guide"
+    last_updated: "2025-01-15"
+    last_reviewed: "2025-01-15"
+    summary: "Developer welcome guide with setup instructions, project structure, development workflow, and contribution guidelines"
+
+working_notes:
+  - path: ".meta/WORKING.md"
+    status: "active"
+    category: "transient_working_notes"
+    last_updated: "2025-01-15"
+    summary: "Transient working notes for active tasks, hypotheses, session outcomes"
+  
+  - path: "docs/developer/PLANNING_SUMMARY.md"
+    status: "active"
+    category: "planning_document"
+    last_updated: "2025-01-15"
+    summary: "Complete planning summary for EPIC-001 with all 10 stories and 126 tasks detailed"
+
+epics:
+  - path: ".meta/updates/EPIC-001-OCR-Compression-System.yaml"
+    status: "to-do"
+    category: "epic"
+    last_updated: "2025-01-15"
+    summary: "OCR-Based Codebase Compression System - 10 stories covering full compression pipeline for Love Oracle AI codebase"
+
+session_prompts:
+  - path: "docs/developer/Session_1_Prompt.md"
+    status: "active"
+    category: "session_prompt"
+    last_updated: "2025-01-15"
+    summary: "Initial project setup and framing session"
+
+archived_notes: []
+
+bugs_directory: ".meta/bugs/"
+archive_directory: ".meta/archive/"
+
+test_documentation:
+  - path: "docs/developer/TEST_COVERAGE_REPORT.md"
+    status: "pending"
+    category: "test_metrics"
+    summary: "Single source of truth for test coverage metrics"
+
+sop:
+  - path: "docs/developer/SOP.md"
+    title: "Standard Operating Procedure - Token Estimation & DeepSeek-OCR"
+    description: "SOP for token estimation rules, DeepSeek-OCR insights, and UI guidelines"
+    created: "2025-01-15"
+    status: "active"
+
+design_documentation:
+  - path: "docs/design/PROJECT_DESIGN_RULEBOOK.md"
+    title: "Project Design Rulebook"
+    description: "Single source of truth (SSOT) for all frontend design, styling, and UI implementation. All design specifications migrated and active."
+    created: "2025-01-15"
+    status: "active"
+    note: "This is the authoritative source for all design specifications. See Section 9 for legacy references."
+  
+  - path: "docs/design/UI_IMPLEMENTATION.md"
+    title: "UI Implementation Documentation (Legacy)"
+    description: "Historical UI component documentation. Design specifications have been migrated to PROJECT_DESIGN_RULEBOOK.md. This file is maintained for traceability only."
+    created: "2025-01-15"
+    status: "deprecated"
+    note: "Design specs migrated to PROJECT_DESIGN_RULEBOOK.md. See rulebook Section 9 for details."
+
+backlog:
+  - path: ".meta/updates/BACKLOG.yaml"
+    title: "Product Backlog - Token Estimation & DeepSeek-OCR Insights"
+    description: "Backlog with stories for token estimation and DeepSeek-OCR infrastructure"
+    created: "2025-01-15"
+    status: "active"
+  
+  - path: "docs/developer/BACKLOG_SUMMARY.md"
+    title: "Backlog Summary"
+    description: "Summary of backlog status and implementation progress"
+    created: "2025-01-15"
+    status: "active"
+
