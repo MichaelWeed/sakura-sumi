@@ -1,0 +1,14 @@
+version: "3.9"
+services:
+  web:
+    build: .
+    container_name: sakura-sumi-web
+    ports:
+      - "5001:5001"
+    volumes:
+      - ./build:/app/build
+      - ./output:/app/output
+    environment:
+      FLASK_SECRET_KEY: ${FLASK_SECRET_KEY:-dev}
+      SAKURA_TELEMETRY: ${SAKURA_TELEMETRY:-1}
+    command: ["python", "scripts/run_web.py"]
