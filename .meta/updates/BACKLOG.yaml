@@ -1,0 +1,377 @@
+id: "BACKLOG-001"
+title: "OCR Compression System - Product Backlog"
+status: "active"
+created_date: "2025-01-15"
+updated_date: "2025-01-15"
+
+# Priority Levels: P0 (Critical), P1 (High), P2 (Medium), P3 (Low)
+# Status: backlog, in-progress, testing, done, blocked
+
+epics:
+  - id: "EPIC-001"
+    title: "OCR-Based Codebase Compression System"
+    status: "completed"
+    stories_completed: 10
+    stories_total: 10
+
+  - id: "EPIC-002"
+    title: "Token Estimation & DeepSeek-OCR Insights Infrastructure"
+    status: "in-progress"
+    priority: "P0"
+    description: |
+      Implement comprehensive token estimation system with DeepSeek-OCR insights.
+      Focus on backend infrastructure for accurate pre/post calculations and clean
+      UI display of estimates and recommendations.
+
+stories:
+  # Updated Story: Token Estimation Integration
+  - id: "STORY-011"
+    title: "Token Estimation Integration - Pre/Post Scan & Warnings"
+    epic: "EPIC-002"
+    status: "backlog"
+    priority: "P0"
+    description: |
+      Integrate token estimation into compression pipeline. Implement pre-scan
+      calculation using tiktoken (cl100k_base), post-compression estimation
+      with 10x ratio and 10k rounding, and warning logic for <50k and <10k thresholds.
+    acceptance_criteria:
+      - Pre-scan calculates tokens using tiktoken cl100k_base encoding
+      - Post-compression estimate = ceil(pre/10) rounded to nearest 10k
+      - Warning displayed for 10k-50k tokens: "Minimal savings—proceed for standardization?"
+      - Error displayed for <10k tokens: "Not recommended"
+      - Estimates displayed in UI before compression starts
+      - Estimates stored in job metadata
+    tasks:
+      - "Create TokenEstimationService class"
+      - "Implement pre-compression token calculation (tiktoken)"
+      - "Implement post-compression estimation (10x ratio, 10k rounding)"
+      - "Implement warning threshold logic (<50k, <10k)"
+      - "Integrate estimation into CompressionPipeline"
+      - "Add estimation to file discovery phase"
+      - "Store estimates in job metadata"
+      - "Add estimation to API responses"
+      - "Write unit tests for token estimation"
+      - "Test warning thresholds (50k, 10k boundaries)"
+      - "Test edge cases (empty files, encoding errors)"
+      - "Update pipeline to show estimates before starting"
+    estimated_effort: "5 story points"
+    dependencies: []
+    
+  # New Story: DeepSeek-OCR Insights Infrastructure
+  - id: "STORY-012"
+    title: "DeepSeek-OCR Insights Backend Infrastructure"
+    epic: "EPIC-002"
+    status: "backlog"
+    priority: "P0"
+    description: |
+      Build backend infrastructure for DeepSeek-OCR insights calculation.
+      Implement service to calculate compression metrics, processing time,
+      throughput capacity, and vision token conversion. Load configuration
+      from JSON with embedded constants.
+    acceptance_criteria:
+      - DeepSeekInsightsService calculates all metrics
+      - Compression ratio: 10x displayed
+      - Accuracy: 97% displayed
+      - Processing time calculated from page count (pages * 0.005s)
+      - Throughput capacity percentage calculated
+      - Vision token conversion (1k text → 100 vision tokens)
+      - Configuration loaded from JSON with defaults
+      - All calculations return structured data for UI
+    tasks:
+      - "Create DeepSeekInsightsService class"
+      - "Implement compression metrics calculation"
+      - "Implement processing time estimation (pages * 0.005s)"
+      - "Implement throughput capacity calculation"
+      - "Implement vision token conversion (text * 0.1)"
+      - "Create deepseek_ocr.json configuration file"
+      - "Load configuration with fallback defaults"
+      - "Format duration for display (seconds → human-readable)"
+      - "Calculate throughput capacity percentage"
+      - "Integrate insights calculation into pipeline"
+      - "Add insights to API responses"
+      - "Write unit tests for insights calculation"
+      - "Test configuration loading (with/without file)"
+      - "Test processing time calculation accuracy"
+    estimated_effort: "5 story points"
+    dependencies: ["STORY-011"]
+    
+  # New Story: UI Panel for Estimates & Insights
+  - id: "STORY-013"
+    title: "UI Panel for Token Estimates & DeepSeek Insights"
+    epic: "EPIC-002"
+    status: "completed"
+    priority: "P1"
+    description: |
+      Create clean UI components for displaying token estimates and DeepSeek-OCR
+      insights. Implement animated token bar (Before/After), collapsible insights
+      panel with technical details hidden by default, and updated history table
+      with estimates.
+    acceptance_criteria:
+      - Animated token bar shows Before/After with percentage savings
+      - Color coding: Green (>50k), Yellow (10k-50k), Red (<10k)
+      - Collapsible insights panel (collapsed by default)
+      - Summary view shows: Ratio (10x), Accuracy (97%), Est. Time
+      - Detailed view shows: All metrics + technical details
+      - "Show Details" / "Hide Details" button with smooth animation
+      - History table includes token estimates columns
+      - Estimates displayed for all jobs in history
+      - Responsive design (mobile-friendly)
+    tasks:
+      - "Create TokenEstimationBar component (animated)"
+      - "Implement Before/After token display"
+      - "Add color coding based on token count"
+      - "Create CollapsibleInsightsPanel component"
+      - "Implement collapse/expand animation"
+      - "Add summary view (ratio, accuracy, time)"
+      - "Add detailed view (all metrics + technical)"
+      - "Create 'Show Details' / 'Hide Details' button"
+      - "Update history table with token estimate columns"
+      - "Add estimates to job history display"
+      - "Style components with Tailwind CSS"
+      - "Add responsive breakpoints"
+      - "Test animations and transitions"
+      - "Test collapsible panel behavior"
+      - "Test color coding logic"
+      - "Update API to return formatted estimates"
+      - "Integrate components into main UI"
+    estimated_effort: "8 story points"
+    dependencies: ["STORY-011", "STORY-012"]
+    
+  # Supporting Stories
+  - id: "STORY-014"
+    title: "Configuration Management for DeepSeek Metrics"
+    epic: "EPIC-002"
+    status: "backlog"
+    priority: "P2"
+    description: |
+      Create JSON configuration file for DeepSeek-OCR metrics with embedded
+      constants. Implement configuration loading with fallback defaults.
+    acceptance_criteria:
+      - deepseek_ocr.json configuration file created
+      - All constants embedded (ratio, accuracy, throughput, etc.)
+      - Configuration loader with fallback defaults
+      - Configuration validation
+      - Configuration can be updated without code changes
+    tasks:
+      - "Create configs/deepseek_ocr.json"
+      - "Embed all DeepSeek constants in JSON"
+      - "Implement configuration loader"
+      - "Add fallback defaults if file missing"
+      - "Add configuration validation"
+      - "Document configuration schema"
+    estimated_effort: "2 story points"
+    dependencies: []
+    
+  - id: "STORY-015"
+    title: "API Endpoints for Token Estimates & Insights"
+    epic: "EPIC-002"
+    status: "backlog"
+    priority: "P1"
+    description: |
+      Add API endpoints to expose token estimates and DeepSeek insights.
+      Integrate with existing job management endpoints.
+    acceptance_criteria:
+      - GET /api/estimate endpoint returns pre/post estimates
+      - GET /api/job/<id>/insights returns DeepSeek insights
+      - Estimates included in job status responses
+      - Estimates included in job history responses
+      - Error handling for estimation failures
+    tasks:
+      - "Create /api/estimate endpoint"
+      - "Create /api/job/<id>/insights endpoint"
+      - "Add estimates to job status response"
+      - "Add estimates to job history response"
+      - "Add error handling"
+      - "Write API tests"
+      - "Update API documentation"
+    estimated_effort: "3 story points"
+    dependencies: ["STORY-011", "STORY-012"]
+
+# Technical Debt & Improvements
+technical_debt:
+  - id: "TD-001"
+    title: "Add comprehensive error handling for token estimation failures"
+    priority: "P2"
+    description: "Handle edge cases where token estimation fails (encoding errors, binary files, etc.)"
+    
+  - id: "TD-002"
+    title: "Optimize token estimation for large codebases"
+    priority: "P3"
+    description: "Consider caching or incremental calculation for very large codebases"
+
+# Future Enhancements
+future_enhancements:
+  - id: "FE-001"
+    title: "Real-time token estimation during compression"
+    priority: "P3"
+    description: "Update estimates as files are processed (if applicable)"
+    
+  - id: "FE-002"
+    title: "Token estimation for individual files"
+    priority: "P3"
+    description: "Show per-file token estimates in detailed view"
+    
+  - id: "FE-003"
+    title: "Historical token trend analysis"
+    priority: "P3"
+    description: "Track token estimates over time for codebase growth analysis"
+
+# Design System Enhancements
+design_system:
+  - id: "DS-001"
+    title: "Design Pattern Gap Analysis & Standardization"
+    priority: "P2"
+    status: "backlog"
+    description: |
+      Address design pattern gaps identified during PROJECT_DESIGN_RULEBOOK migration.
+      Establish missing component patterns and resolve inconsistencies for a complete design system.
+    observations:
+      undefined_patterns:
+        - "Link Styling: No explicit hover/active/focus states for text links"
+        - "Loading Spinners: No spinner component for async operations (currently uses progress bars)"
+        - "Modal/Dialog Components: No modal or dialog patterns for confirmations/details"
+        - "Form Validation States: No visual feedback for invalid fields (error messages, highlighting)"
+        - "Toast Notifications: No toast system (currently uses browser alerts)"
+        - "Skeleton Screens: No loading skeleton patterns for content placeholders"
+        - "Empty State Illustrations: Empty states use text only, no icon/illustration patterns"
+        - "Status Badge Variants: Badges exist but no comprehensive badge system defined"
+        - "Icon System: Icons used (▼, ▲, ✅, ⚠️, ❌) but no icon library or sizing system"
+        - "Z-Index Scale: Tooltips use z-index 1000, but no z-index scale for layering"
+      inconsistencies:
+        - "Progress Bar Heights: Two heights (10px and 16px) without clear rationale"
+        - "Button Sizing: Mixed text sizes (12px and 16px) without clear hierarchy"
+        - "Table Cell Padding: Uses 16px/12px which doesn't align with base_unit multiples (should be 16px/16px)"
+        - "Tooltip Padding: Consistent 12px padding, but max-width 320px doesn't align with spacing scale"
+    recommendations:
+      - "Establish Icon System: Define icon library (e.g., Heroicons, Font Awesome) and sizing scale"
+      - "Create Modal Component: Define modal/dialog patterns for confirmations and detailed views"
+      - "Form Validation Patterns: Define error message placement, field highlighting, and validation feedback"
+      - "Toast Notification System: Replace browser alerts with styled toast notifications"
+      - "Loading States: Define spinner component and skeleton screen patterns"
+      - "Z-Index Scale: Establish z-index scale (e.g., dropdown: 10, modal: 20, tooltip: 30)"
+      - "Status Badge System: Create comprehensive badge component with all variants"
+      - "Link Styles: Define link hover/active/focus states for accessibility"
+      - "Empty State Patterns: Create empty state component with optional illustrations"
+      - "Standardize Progress Bars: Choose single height or define when to use each variant"
+    source: "PROJECT_DESIGN_RULEBOOK.md Section 10"
+    created_date: "2025-01-15"
+
+  - id: "DS-002"
+    title: "Verify No Code Dependencies on Design Spec Files"
+    priority: "P3"
+    status: "completed"
+    t_shirt_size: "XS"
+    description: |
+      Verify that no executable code reads or depends on design specification files
+      (markdown, YAML, etc.). Initial scan found no dependencies, but this ticket
+      ensures comprehensive verification and establishes monitoring.
+    acceptance_criteria:
+      - No Python code reads UI_IMPLEMENTATION.md or other design spec files
+      - No JavaScript code references design spec files
+      - No build scripts or CI/CD pipelines depend on design spec files
+      - Documentation updated to clarify that rulebook is SSOT
+      - Code review checklist updated to prevent future dependencies
+    tasks:
+      - "Complete codebase scan for file I/O operations on design spec files"
+      - "Verify no JSON/YAML parsing of design spec files"
+      - "Check build scripts and CI/CD configurations"
+      - "Update code review guidelines to prevent design spec dependencies"
+      - "Document verification results"
+    observations:
+      initial_scan: "No code dependencies found on design spec files"
+      files_checked:
+        - "src/web/app.py - Only reads config JSON files, not design specs"
+        - "src/utils/deepseek_insights.py - Only reads config JSON files"
+        - "src/compression/pipeline.py - Only reads checkpoint JSON files"
+        - "src/compression/pdf_converter.py - Only reads content files, not design specs"
+      conclusion: "No code dependencies identified. Verification ticket created for completeness."
+    created_date: "2025-01-15"
+
+  - id: "DS-003"
+    title: "Resolve Design Spec Duplication in SOP.md"
+    priority: "P2"
+    status: "completed"
+    t_shirt_size: "S"
+    description: |
+      SOP.md Section 3 "UI Cleanliness Rules" contains design specifications that
+      duplicate content in PROJECT_DESIGN_RULEBOOK.md. This creates a conflict
+      and violates SSOT principle. Update SOP.md to reference rulebook instead.
+    acceptance_criteria:
+      - SOP.md Section 3 references PROJECT_DESIGN_RULEBOOK.md as SSOT
+      - Duplicate design specifications removed from SOP.md
+      - SOP.md retains operational context (how to use components) but defers design specs to rulebook
+      - No design specifications remain in SOP.md
+      - Cross-reference added from rulebook to SOP.md for operational context
+    tasks:
+      - "Review SOP.md Section 3 for design spec duplication"
+      - "Extract operational context (how components work) vs design specs (how components look)"
+      - "Remove design specifications from SOP.md"
+      - "Add reference to PROJECT_DESIGN_RULEBOOK.md in SOP.md"
+      - "Update rulebook to reference SOP.md for operational context where appropriate"
+      - "Verify no design conflicts remain"
+    conflicts_identified:
+      - "SOP.md Section 3.1: Token Estimation Display - Contains color coding, layout specs"
+      - "SOP.md Section 3.2: Insights Panel - Contains component structure, animation specs"
+      - "These should reference PROJECT_DESIGN_RULEBOOK.md instead"
+    resolution_approach:
+      - "Keep operational context in SOP.md (e.g., 'Token estimation displays before/after counts')"
+      - "Remove design specifications (e.g., 'Green: >50k tokens') - reference rulebook instead"
+      - "Add clear note: 'For design specifications, see PROJECT_DESIGN_RULEBOOK.md'"
+    created_date: "2025-01-15"
+
+  - id: "DS-004"
+    title: "Address Design Pattern Gaps from Rulebook Section 10"
+    priority: "P2"
+    status: "completed"
+    completed_date: "2025-01-15"
+    implementation_notes: |
+      All design pattern gaps addressed and implemented:
+      - Icon system: Migrated to inline SVG (Heroicons-style)
+      - Toast notifications: Replaced all alert() calls
+      - Modal components: Created reusable modal system
+      - Loading spinners: Added spinner component with 3 sizes
+      - Skeleton screens: Added skeleton loading placeholders
+      - Z-index: Standardized to Tailwind scale (z-30, z-40, z-50)
+      - Table padding: Updated to py-4 (16px) to align with base_unit
+    t_shirt_size: "L"
+    description: |
+      PROJECT_DESIGN_RULEBOOK.md Section 10 identifies 10 undefined design patterns,
+      4 inconsistencies, and 10 recommendations. This ticket addresses these gaps to
+      complete the design system. This is a comprehensive enhancement ticket.
+    acceptance_criteria:
+      - All 10 undefined patterns have specifications in rulebook
+      - All 4 inconsistencies resolved with clear rationale
+      - All 10 recommendations implemented or documented as future work
+      - Rulebook Section 10 updated to reflect completed work
+      - Design system is complete and consistent
+    undefined_patterns_to_address:
+      - "Link Styling: Define hover/active/focus states"
+      - "Loading Spinners: Define spinner component"
+      - "Modal/Dialog Components: Define modal patterns"
+      - "Form Validation States: Define error message patterns"
+      - "Toast Notifications: Define toast system"
+      - "Skeleton Screens: Define loading skeleton patterns"
+      - "Empty State Illustrations: Define empty state component"
+      - "Status Badge Variants: Complete badge system"
+      - "Icon System: Define icon library and sizing"
+      - "Z-Index Scale: Establish layering system"
+    inconsistencies_to_resolve:
+      - "Progress Bar Heights: Standardize or document when to use each"
+      - "Button Sizing: Establish clear hierarchy"
+      - "Table Cell Padding: Align with base_unit multiples"
+      - "Tooltip Padding: Align max-width with spacing scale"
+    recommendations_to_implement:
+      - "Establish Icon System"
+      - "Create Modal Component"
+      - "Form Validation Patterns"
+      - "Toast Notification System"
+      - "Loading States (spinner + skeleton)"
+      - "Z-Index Scale"
+      - "Status Badge System"
+      - "Link Styles"
+      - "Empty State Patterns"
+      - "Standardize Progress Bars"
+    dependencies: ["DS-001"]
+    source: "PROJECT_DESIGN_RULEBOOK.md Section 10"
+    created_date: "2025-01-15"
+

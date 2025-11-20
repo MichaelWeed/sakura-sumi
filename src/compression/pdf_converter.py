@@ -109,6 +109,13 @@ class PDFConverter:
     
     def _read_file(self, file_info: FileInfo) -> Optional[str]:
         """Read file content with proper encoding handling."""
+        file_ext = Path(file_info.path).suffix.lower()
+        
+        # Handle .docx files (Microsoft Word documents)
+        if file_ext == '.docx':
+            return self._read_docx(file_info)
+        
+        # Handle regular text files
         try:
             with open(file_info.path, 'r', encoding=file_info.encoding, errors='replace') as f:
                 return f.read()
@@ -131,6 +138,36 @@ class PDFConverter:
             self.conversion_stats['errors'].append({
                 'file': file_info.relative_path,
                 'error': f'File read error: {str(e)}'
+            })
+            return None
+    
+    def _read_docx(self, file_info: FileInfo) -> Optional[str]:
+        """Extract text from .docx files."""
+        try:
+            from docx import Document
+        except ImportError:
+            self.conversion_stats['errors'].append({
+                'file': file_info.relative_path,
+                'error': 'python-docx library not installed. Install with: pip install python-docx'
+            })
+            return None
+        
+        try:
+            doc = Document(file_info.path)
+            # Extract text from all paragraphs
+            paragraphs = [para.text for para in doc.paragraphs]
+            # Also extract text from tables
+            for table in doc.tables:
+                for row in table.rows:
+                    for cell in row.cells:
+                        paragraphs.append(cell.text)
+            
+            content = '\n\n'.join(paragraphs)
+            return content if content.strip() else None
+        except Exception as e:
+            self.conversion_stats['errors'].append({
+                'file': file_info.relative_path,
+                'error': f'Failed to extract text from .docx: {str(e)}'
             })
             return None
     

@@ -1,0 +1,262 @@
+id: "EPIC-001"
+title: "OCR-Based Codebase Compression System for Love Oracle AI"
+status: "completed"
+description: |
+  Build a comprehensive OCR compression system to convert the Love Oracle AI codebase 
+  (React/TypeScript/Tailwind app) into compressed visual format for LLM analysis. 
+  The system will achieve 7-20x token compression by converting text files to dense PDFs 
+  and optionally applying DeepSeek-OCR compression for maximum efficiency.
+  
+  Target directory: '/Users/johndoe/Projects/LoveOracleAI copy'
+  Expected files: ~102 source files (TypeScript, TSX, JSON, YAML, CSS, HTML)
+  
+created_date: "2025-01-15"
+updated_date: "2025-01-15"
+completed_stories: 10
+total_stories: 10
+status: "completed"
+assignee: null
+
+stories:
+  - id: "STORY-001"
+    title: "Environment Setup & Dependencies"
+    status: "completed"
+    description: |
+      Set up Python environment and install required dependencies for PDF generation 
+      and OCR compression. Configure project structure for the compression tooling.
+    tasks:
+      - "Create Python virtual environment"
+      - "Install reportlab, pyyaml, pillow dependencies"
+      - "Install optional DeepSeek-OCR dependencies (vllm, huggingface-cli)"
+      - "Create project structure for compression tooling"
+      - "Document environment setup in NOTES.MD"
+      - "Create requirements.txt or pyproject.toml"
+    
+  - id: "STORY-002"
+    title: "File Discovery & Inventory System"
+    status: "completed"
+    description: |
+      Build a file discovery system that scans the Love Oracle AI directory, 
+      identifies all relevant source files, and creates an inventory. Filter out 
+      build artifacts, node_modules, Android-specific files, and other non-source files.
+    tasks:
+      - "Implement file discovery function (find all .ts, .tsx, .js, .jsx, .json, .yaml, .yml, .css, .html)"
+      - "Create exclusion filters (node_modules, dist, android, latest, .git, build artifacts)"
+      - "Generate file inventory with metadata (size, type, path)"
+      - "Create file categorization system (by type, by directory structure)"
+      - "Output inventory report (file count, total size, breakdown by type)"
+      - "Handle edge cases (binary files, very large files, encoding issues)"
+    
+  - id: "STORY-003"
+    title: "Dense PDF Conversion Engine"
+    status: "completed"
+    description: |
+      Build the core PDF conversion engine that converts source code files into 
+      dense, OCR-optimized PDFs. Use small fonts, minimal margins, and efficient 
+      layouts to maximize information per page (target: 700-800 text tokens per page).
+    tasks:
+      - "Implement PDF generation using reportlab with dense layout settings"
+      - "Configure font settings (Courier, 8pt font size, minimal margins)"
+      - "Handle different file types (JSON, YAML, TypeScript, TSX, CSS, HTML)"
+      - "Implement syntax-aware formatting (preserve structure, handle indentation)"
+      - "Add pagination logic (handle long files across multiple pages)"
+      - "Handle line truncation for very long lines (max 110 chars per line)"
+      - "Preserve file structure and hierarchy in PDF output"
+      - "Add error handling for encoding issues and malformed files"
+    
+  - id: "STORY-004"
+    title: "Batch Processing Pipeline Enhancements"
+    status: "completed"
+    description: |
+      Enhance the batch processing system with parallel processing, better progress tracking, 
+      and advanced error recovery. Basic batch processing is already implemented in the pipeline, 
+      but needs enhancements for large codebases and better user experience.
+    tasks:
+      - "Add parallel processing option using multiprocessing/threading for large codebases"
+      - "Implement configurable batch size (process N files at a time)"
+      - "Enhance progress tracking with percentage, ETA, and per-file status"
+      - "Add progress bar visualization (tqdm or custom)"
+      - "Implement resume capability (skip already-processed files)"
+      - "Add checkpoint/state saving for long-running operations"
+      - "Enhance error recovery with retry logic for transient failures"
+      - "Add detailed per-file error logging and reporting"
+      - "Implement memory management for very large codebases"
+      - "Add cancellation support (Ctrl+C graceful shutdown)"
+    
+  - id: "STORY-005"
+    title: "DeepSeek-OCR Integration (Optional Advanced Compression)"
+    status: "completed"
+    description: |
+      Integrate DeepSeek-OCR for maximum compression (optional). This will convert 
+      PDFs to compressed visual tokens achieving 7-20x compression ratios. Target 
+      7-10x compression for 97% accuracy. This is an advanced feature that requires 
+      additional dependencies and may not be needed for all use cases.
+    tasks:
+      - "Research DeepSeek-OCR API, model availability, and integration requirements"
+      - "Document installation process for DeepSeek-OCR dependencies (vllm, transformers)"
+      - "Create optional dependency detection and graceful degradation"
+      - "Implement PDF to OCR compression pipeline wrapper"
+      - "Add compression mode selection (small/medium/large for different ratios)"
+      - "Configure compression parameters (base-size: 1024, compression-mode: small/medium/large)"
+      - "Implement batch PDF processing for OCR compression"
+      - "Generate compressed Markdown output with proper formatting"
+      - "Add compression ratio reporting and accuracy metrics"
+      - "Create comparison tool (original PDF vs compressed output)"
+      - "Document accuracy trade-offs (7x: 97%, 10x: 97%, 15x: 85-90%, 20x: 60%)"
+      - "Add configuration file for OCR compression settings"
+      - "Implement caching for already-compressed PDFs"
+      - "Add progress tracking for OCR compression (can be slow)"
+    
+  - id: "STORY-006"
+    title: "Browser Portal / Launcher Interface"
+    status: "completed"
+    description: |
+      Create a user-friendly interface (browser-based or CLI launcher) that allows 
+      easy selection of source directory and execution of the compression pipeline. 
+      Provide real-time progress updates and results summary. CLI launcher is already 
+      implemented, but web portal would provide better UX for non-technical users.
+    tasks:
+      - "Enhance CLI launcher with interactive mode (prompts, confirmations)"
+      - "Add CLI configuration file support (.ocr-compress.yaml)"
+      - "Create Flask/FastAPI web portal with modern UI (Tailwind CSS or similar)"
+      - "Implement directory picker/browser in web interface"
+      - "Add drag-and-drop directory upload support"
+      - "Create web-based compression options UI (with/without DeepSeek-OCR, parallel processing)"
+      - "Implement WebSocket or SSE for real-time progress updates"
+      - "Add progress visualization (progress bars, file-by-file status)"
+      - "Create results summary page with statistics and download links"
+      - "Implement download/export functionality (ZIP archive of PDFs)"
+      - "Add background job queue system (Celery or similar) for web interface"
+      - "Create job history and status tracking"
+      - "Add authentication/security for web portal (optional)"
+      - "Implement responsive design for mobile devices"
+      - "Add help/documentation links in UI"
+    
+  - id: "STORY-007"
+    title: "Compression Metrics & Reporting"
+    status: "completed"
+    description: |
+      Build comprehensive reporting system that tracks compression ratios, file counts, 
+      token estimates, and provides summary statistics. Help users understand if their 
+      codebase will fit in Gemini's 2M token context window. Basic reporting exists, 
+      but needs token estimation and enhanced visualizations.
+    tasks:
+      - "Implement token estimation library integration (tiktoken or similar)"
+      - "Calculate original token estimates (text-based, per-file and total)"
+      - "Calculate compressed token estimates (visual tokens for PDFs)"
+      - "Estimate OCR compression token savings (if DeepSeek-OCR used)"
+      - "Compute compression ratios (original vs PDF vs OCR-compressed)"
+      - "Generate comprehensive summary report (file counts, sizes, compression ratios, token counts)"
+      - "Add Gemini context window compatibility check (2M token limit with warnings)"
+      - "Calculate estimated cost savings (if applicable)"
+      - "Create visual charts/graphs using matplotlib or plotly (file size distribution, compression ratios)"
+      - "Generate file type breakdown charts"
+      - "Create compression timeline visualization (if processing time tracked)"
+      - "Export reports in multiple formats (JSON, Markdown, HTML, PDF)"
+      - "Add comparison reports (before/after compression)"
+      - "Implement report templates for different use cases"
+      - "Add report generation to CLI and web interface"
+    
+  - id: "STORY-008"
+    title: "Validation & Quality Assurance"
+    status: "completed"
+    description: |
+      Implement validation and QA systems to ensure PDFs are correctly generated, 
+      content is preserved, and compression maintains code readability. Add comprehensive 
+      tests and verification steps to ensure reliability and correctness.
+    tasks:
+      - "Set up pytest testing framework and test directory structure"
+      - "Create unit tests for FileDiscovery class (file detection, exclusions, categorization)"
+      - "Create unit tests for PDFConverter class (PDF generation, formatting, error handling)"
+      - "Create integration tests for CompressionPipeline (end-to-end workflows)"
+      - "Implement PDF validation tests (verify PDF structure, page count, content presence)"
+      - "Create content comparison utility (original file vs PDF text extraction using PyPDF2/pdfplumber)"
+      - "Add content accuracy verification (character-level and line-level comparison)"
+      - "Implement compression accuracy verification (if using DeepSeek-OCR)"
+      - "Create test fixtures for different file types (TypeScript, JSON, YAML, CSS, HTML)"
+      - "Add edge case testing (very large files >10MB, special characters, Unicode, encoding issues)"
+      - "Test with various codebase structures (nested directories, symlinks, empty files)"
+      - "Add performance benchmarks (processing time, memory usage)"
+      - "Create regression test suite (test against known good outputs)"
+      - "Document known limitations and trade-offs"
+      - "Create QA checklist for compression output validation"
+      - "Add continuous integration setup (GitHub Actions or similar)"
+      - "Implement code coverage reporting (aim for >80% coverage)"
+      - "Add linting and code quality checks (flake8, black, mypy)"
+    
+  - id: "STORY-009"
+    title: "Documentation & User Guide"
+    status: "completed"
+    description: |
+      Create comprehensive documentation for the compression system including setup 
+      instructions, usage guide, API documentation, and troubleshooting. Documentation 
+      should be clear, comprehensive, and accessible to both technical and non-technical users.
+    tasks:
+      - "Create README.md with project overview, features, and quick start"
+      - "Write detailed setup and installation guide (all platforms: macOS, Linux, Windows)"
+      - "Document virtual environment setup and dependency management"
+      - "Create comprehensive usage documentation for CLI interface"
+      - "Create usage documentation for web portal (if implemented)"
+      - "Document all compression parameters and configuration options"
+      - "Add command-line argument reference with examples"
+      - "Create configuration file documentation (.ocr-compress.yaml format)"
+      - "Write troubleshooting guide (common issues, error messages, solutions)"
+      - "Document file type support and limitations"
+      - "Create example workflows (basic compression, with OCR, batch processing)"
+      - "Add use case examples (small codebase, large codebase, specific frameworks)"
+      - "Document integration with Gemini upload process (step-by-step guide)"
+      - "Add FAQ section (common questions, compression ratios, accuracy)"
+      - "Create API documentation for Python library usage"
+      - "Add developer documentation (contributing, architecture, extending)"
+      - "Create video tutorials or screenshots for complex workflows"
+      - "Document performance considerations and optimization tips"
+      - "Add changelog and version history"
+      - "Create LICENSE file and contribution guidelines"
+    
+  - id: "STORY-010"
+    title: "Love Oracle AI Specific Configuration & Optimization"
+    status: "completed"
+    description: |
+      Configure and optimize the compression system specifically for the Love Oracle AI codebase, 
+      including proper exclusions for Android build files, Capacitor configs, and other 
+      project-specific artifacts. Ensure optimal compression settings and verify completeness.
+    tasks:
+      - "Complete analysis of Love Oracle AI project structure (already partially done)"
+      - "Document all exclusion patterns needed (android/, dist/, latest/, build artifacts, node_modules)"
+      - "Identify and document key source directories (client/, server/, shared/)"
+      - "Create Love Oracle AI specific configuration preset"
+      - "Test compression on full Love Oracle AI codebase"
+      - "Verify output quality (check sample PDFs for readability and completeness)"
+      - "Verify all source files are included (no missing files)"
+      - "Check that excluded files are properly filtered (no Android build files)"
+      - "Optimize compression settings for React/TypeScript codebase (font size, margins)"
+      - "Test with different compression modes and measure results"
+      - "Generate Love Oracle AI specific compression report"
+      - "Document Love Oracle AI specific configuration and settings"
+      - "Create example command for Love Oracle AI compression"
+      - "Add Love Oracle AI to test fixtures for regression testing"
+      - "Verify PDFs are suitable for Gemini upload (size, format, readability)"
+      - "Create comparison report (before/after compression for Love Oracle AI)"
+
+priority: "high"
+severity: "major"
+tags: ["ocr-compression", "llm-integration", "codebase-analysis", "pdf-generation"]
+related_bugs: []
+blocked_by: []
+blocks: []
+
+notes: |
+  This epic implements the OCR compression approach based on DeepSeek-OCR's breakthrough 
+  context compression technique. The system will convert the Love Oracle AI React/TypeScript 
+  codebase into compressed visual format suitable for LLM analysis.
+  
+  Key metrics:
+  - Target compression: 7-10x (97% accuracy)
+  - Maximum compression: 20x (60% accuracy, not recommended for code)
+  - Expected files: ~102 source files
+  - Target: Fit in Gemini's 2M token context window
+  
+  The Love Oracle AI app is a React/TypeScript/Tailwind application (not Android native) 
+  that was built by rep AI. It uses Capacitor for mobile deployment, but the core is a 
+  web application.
+
