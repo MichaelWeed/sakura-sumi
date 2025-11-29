@@ -438,6 +438,13 @@ def compress():
         if not output_dir:
             output_dir = f"{source_dir}_ocr_ready"
     
+    # Resolve output_dir to absolute path for all cases (needed for "Open Folder" functionality)
+    if output_dir:
+        try:
+            output_dir = str(Path(output_dir).expanduser().resolve())
+        except Exception:
+            pass  # Keep original if resolution fails
+    
     # Calculate estimates before starting
     estimates = None
     try:
@@ -465,9 +472,9 @@ def compress():
     job_counter += 1
     job_id = f"job_{job_counter}_{int(datetime.now().timestamp())}"
     
-    # Sanitize paths for storage: use basename only to avoid exposing full directory structure
-    def sanitize_path_for_storage(path_str: str) -> str:
-        """Return basename of path to avoid exposing full directory structure."""
+    # Sanitize paths for display: use basename only to avoid exposing full directory structure
+    def sanitize_path_for_display(path_str: str) -> str:
+        """Return basename of path for display purposes."""
         if not path_str:
             return path_str
         return Path(path_str).name
@@ -475,9 +482,9 @@ def compress():
     job = {
         'id': job_id,
         'status': 'queued',
-        'source_dir': sanitize_path_for_storage(source_label),  # Sanitized: basename only
+        'source_dir': sanitize_path_for_display(source_label),  # Sanitized: basename only for display
         'mode': 'prompt' if is_prompt_mode else 'code',
-        'output_dir': sanitize_path_for_storage(output_dir) if output_dir else sanitize_path_for_storage(f"{source_dir}_ocr_ready"),  # Sanitized: basename only
+        'output_dir': output_dir,  # Full resolved path for operations (already resolved above)
         'created_at': datetime.now().isoformat(),
         'progress': 0,
         'message': 'Job queued',

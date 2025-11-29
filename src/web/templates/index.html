@@ -1609,6 +1609,12 @@ dist/</textarea>
                             newProceedBtn.disabled = true;
                             if (goBackBtn) goBackBtn.disabled = true;
                             
+                            // Hide the recommendation display to prevent duplicate clicks
+                            const recDiv = document.getElementById('recommendation');
+                            if (recDiv) {
+                                recDiv.innerHTML = '';
+                            }
+                            
                             // Use stored submission context
                             const submissionContext = window.pendingSubmissionContext;
                             
