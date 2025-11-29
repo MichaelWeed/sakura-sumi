@@ -13,23 +13,26 @@ We believe in transparency and documenting known limitations helps users make in
 ---
 
 ## Totals
-- Total bugs: 11
+- Total bugs: 13
 
 ## By Status
 - open: 1
 - in-progress: 0
-- resolved: 8
+- resolved: 10
 - closed: 0
 - wont-fix: 2
 - duplicate: 0
 
 ## By Priority
 - critical: 2 (1 resolved, 1 wont-fix - enterprise item)
-- high: 3 (2 resolved, 1 wont-fix - enterprise item)
-- medium: 4 (3 resolved, 1 open)
+- high: 4 (3 resolved, 1 wont-fix - enterprise item)
+- medium: 5 (4 resolved, 1 open)
 - low: 2 (2 resolved)
 
 ## Recent Activity
+- 2025-11-29: Resolved BUG-012 (Proceed Anyway button remains visible). Added code to hide recommendation display after clicking to prevent duplicate compressions.
+- 2025-11-29: Resolved BUG-013 (Open Folder button fails). Fixed by storing full resolved path in job object instead of just basename.
+- 2025-11-29: Logged BUG-012 and BUG-013 during Sakura Sumi portal testing.
 - 2025-02-14: Logged BUG-011 (UI crash when job summary missing). Frontend showResults now has open issue to handle failed jobs gracefully.
 - 2025-01-17: Resolved BUG-008 (Missing favicon.ico). Added inline SVG favicon with sakura emoji.
 - 2025-01-17: Resolved BUG-009 (Prompt Collector dialog viewport). Fixed flexbox layout to keep footer visible and make body scrollable.

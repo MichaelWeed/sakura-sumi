@@ -1,0 +1,100 @@
+id: "BUG-012"
+title: "Proceed Anyway button remains visible after clicking causing duplicate compressions"
+status: "resolved"
+priority: "medium"
+severity: "moderate"
+created_date: "2025-11-29"
+updated_date: "2025-11-29"
+resolved_date: "2025-11-29"
+reporter: "user"
+assignee: "unassigned"
+
+environment:
+  os: "macOS 25.1.0"
+  browser: "All browsers"
+  language_version: "Python 3.14"
+  dependencies: []
+
+description: |
+  When there are minimal savings and a warning is displayed, clicking "Proceed Anyway" 
+  successfully starts the compression job, but the button and recommendation display 
+  remain visible. Users may click the button multiple times thinking it didn't work, 
+  causing duplicate compression jobs to be queued.
+
+steps_to_reproduce:
+  - "Step 1: Start a compression job that triggers a minimal savings warning"
+  - "Step 2: Click 'Proceed Anyway' button"
+  - "Step 3: Observe that compression starts but the button and warning remain visible"
+  - "Step 4: Click 'Proceed Anyway' again (thinking it didn't work)"
+  - "Step 5: Observe that a second compression job is queued"
+
+expected_behavior: |
+  After clicking "Proceed Anyway", the recommendation display (including the buttons) 
+  should be hidden or removed to prevent duplicate clicks and provide clear feedback 
+  that the action was successful.
+
+actual_behavior: |
+  The button is disabled but remains visible, and the recommendation display stays 
+  on screen. Users cannot tell that the compression has started, leading to multiple 
+  clicks and duplicate jobs.
+
+affected_files:
+  - "src/web/templates/index.html"
+
+affected_functions:
+  - "displayTokenEstimation()"
+  - "Proceed Anyway button click handler"
+
+code_snippet: |
+  // In displayTokenEstimation, around line 1604-1647
+  newProceedBtn.addEventListener('click', async (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      
+      window.recommendationConfirmed = true;
+      newProceedBtn.disabled = true;
+      if (goBackBtn) goBackBtn.disabled = true;
+      
+      // Compression job starts but recommendation display remains visible
+      await enqueueCompressionJob(...);
+  });
+
+error_message: |
+  No error message, but duplicate compression jobs are created.
+
+resolution:
+  root_cause: |
+    After clicking "Proceed Anyway", the button was disabled but the recommendation 
+    display (including the buttons) remained visible. Users couldn't tell that the 
+    compression had started, leading to multiple clicks and duplicate jobs.
+  solution: |
+    Added code to clear the recommendation display innerHTML after clicking "Proceed 
+    Anyway", hiding the buttons and warning message to provide clear feedback that 
+    the action succeeded.
+  fix_commit: null
+  fix_pr: null
+
+test_coverage:
+  has_unit_test: false
+  has_integration_test: false
+  regression_test_added: false
+
+tags:
+  - "frontend"
+  - "web"
+  - "ux"
+
+related_bugs: []
+blocked_by: []
+blocks: []
+
+notes: |
+  The button is disabled but not hidden. The recommendation display should be cleared 
+  or hidden after clicking "Proceed Anyway" to provide clear feedback that the 
+  action succeeded.
+
+attachments:
+  screenshots: []
+  logs: []
+  recordings: []
+

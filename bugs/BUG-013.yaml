@@ -1,0 +1,109 @@
+id: "BUG-013"
+title: "Open Folder button fails with 'Folder does not exist' error"
+status: "resolved"
+priority: "high"
+severity: "major"
+created_date: "2025-11-29"
+updated_date: "2025-11-29"
+resolved_date: "2025-11-29"
+reporter: "user"
+assignee: "unassigned"
+
+environment:
+  os: "macOS 25.1.0"
+  browser: "All browsers"
+  language_version: "Python 3.14"
+  dependencies: []
+
+description: |
+  The "Open Folder" button in the job history table always fails with an error 
+  message "Folder does not exist" even though compression completes successfully 
+  and the output files are created. Users must manually navigate to find the 
+  compressed files.
+
+steps_to_reproduce:
+  - "Step 1: Complete a compression job successfully"
+  - "Step 2: Navigate to Job History section"
+  - "Step 3: Click 'Open Folder' button for a completed job"
+  - "Step 4: Observe error message: 'Error: Folder does not exist: [path]'"
+  - "Step 5: Manually navigate to find that the folder does exist at a different location"
+
+expected_behavior: |
+  Clicking "Open Folder" should successfully open the system file manager to the 
+  output directory where the compressed files are located.
+
+actual_behavior: |
+  The API endpoint returns a 404 error saying the folder does not exist, even 
+  though compression completed and files were created. The path being passed may 
+  be incorrect or sanitized incorrectly.
+
+affected_files:
+  - "src/web/app.py"
+  - "src/web/templates/index.html"
+
+affected_functions:
+  - "open_folder()"
+  - "sanitize_path_for_storage()"
+  - "openFolder()"
+
+code_snippet: |
+  // In app.py, around line 469-480
+  def sanitize_path_for_storage(path_str: str) -> str:
+      """Return basename of path to avoid exposing full directory structure."""
+      if not path_str:
+          return path_str
+      return Path(path_str).name
+  
+  job = {
+      'output_dir': sanitize_path_for_storage(output_dir),  # Only stores basename!
+  }
+  
+  // In index.html, around line 2685-2687
+  const actionsHtml = job.status === 'completed' && job.output_dir ? 
+      `<button onclick="openFolder('${job.output_dir}')" ...>` :  // Passes basename only!
+
+error_message: |
+  Error: Folder does not exist: /Users/johndoe/Projects/OCR Compression/podman_ocr_ready
+  (or similar path that doesn't match actual output location)
+
+resolution:
+  root_cause: |
+    The `output_dir` was being stored in the job object as only the basename 
+    (via `sanitize_path_for_storage()` function) for privacy/security reasons. 
+    However, when trying to open the folder, the full absolute path is required, 
+    causing the "Folder does not exist" error.
+  solution: |
+    Changed the job storage to store the full resolved absolute path instead of 
+    just the basename. The path is now resolved using `Path(output_dir).expanduser().resolve()` 
+    before storing in the job object. The `source_dir` field still uses the 
+    sanitized basename for display purposes, but `output_dir` now contains the 
+    full path needed for file operations.
+  fix_commit: null
+  fix_pr: null
+
+test_coverage:
+  has_unit_test: false
+  has_integration_test: false
+  regression_test_added: false
+
+tags:
+  - "backend"
+  - "frontend"
+  - "web"
+  - "file-system"
+
+related_bugs: []
+blocked_by: []
+blocks: []
+
+notes: |
+  The issue appears to be that `output_dir` is stored as only the basename in the 
+  job object (for privacy/security), but when trying to open the folder, the full 
+  path is needed. Need to either store the full path or reconstruct it from the 
+  job context.
+
+attachments:
+  screenshots: []
+  logs: []
+  recordings: []
+
