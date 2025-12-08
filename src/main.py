@@ -94,6 +94,35 @@ def main():
         action='store_true',
         help='Generate visualization charts'
     )
+    parser.add_argument(
+        '--no-smart-concatenation',
+        action='store_true',
+        help='Disable smart concatenation (creates one PDF per file)'
+    )
+    parser.add_argument(
+        '--max-pdfs',
+        type=int,
+        default=10,
+        help='Maximum number of PDFs to create with smart concatenation (default: 10)'
+    )
+    parser.add_argument(
+        '--max-pages-per-pdf',
+        type=int,
+        default=100,
+        help='Maximum pages per PDF (default: 100)'
+    )
+    parser.add_argument(
+        '--max-size-per-pdf-mb',
+        type=int,
+        default=10,
+        help='Maximum size per PDF in MB (default: 10)'
+    )
+    parser.add_argument(
+        '--max-total-pages',
+        type=int,
+        default=1000,
+        help='Maximum total pages across all PDFs (default: 1000)'
+    )
     
     args = parser.parse_args()
     
@@ -128,7 +157,18 @@ def main():
     
     # Run pipeline
     try:
-        results = pipeline.run(verbose=args.verbose)
+        # Use smart concatenation by default (groups files into max 10 PDFs)
+        # Users can disable with --no-smart-concatenation flag
+        if args.no_smart_concatenation:
+            results = pipeline.run(verbose=args.verbose)
+        else:
+            results = pipeline.run_smart_concatenation(
+                max_pdfs=args.max_pdfs,
+                max_pages_per_pdf=args.max_pages_per_pdf,
+                max_size_per_pdf_mb=args.max_size_per_pdf_mb,
+                max_total_pages=args.max_total_pages,
+                verbose=args.verbose
+            )
         
         if results['success']:
             print(f"\n✓ Success! PDFs ready at: {output_dir}")

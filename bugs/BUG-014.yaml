@@ -1,0 +1,92 @@
+id: "BUG-014"
+title: "CLI creates one PDF per file instead of using smart concatenation by default"
+status: "resolved"
+priority: "high"
+severity: "major"
+
+created_date: "2025-01-17"
+updated_date: "2025-01-17"
+resolved_date: "2025-01-17"
+reporter: "User"
+assignee: null
+
+environment:
+  os: "macOS / Linux / Windows"
+  browser: "N/A"
+  language_version: "Python 3.8+"
+  dependencies: []
+
+description: |
+  When compressing a codebase using the CLI tool, the system creates one PDF per file instead of using the smart concatenation feature. This results in many PDFs (e.g., 19 PDFs for a small codebase with 19 files) instead of the expected maximum of 10 PDFs.
+  
+  The smart concatenation feature exists and works correctly when enabled, but it is not the default behavior in the CLI. Users must explicitly enable it, which is not intuitive.
+
+steps_to_reproduce:
+  - "Step 1: Run compression on a codebase with multiple files"
+  - "Step 2: Example: python scripts/compress.py /Users/johndoe/Downloads/opensource-repurposeai -v"
+  - "Step 3: Observe output directory"
+  - "Step 4: Count the number of PDF files created"
+
+expected_behavior: |
+  The CLI should use smart concatenation by default, grouping files into a maximum of 10 well-organized PDFs. This matches the behavior of the web portal when smart concatenation is enabled.
+
+actual_behavior: |
+  The CLI creates one PDF per file, resulting in many PDFs (e.g., 19 PDFs for 19 files). This makes it difficult to manage and upload to LLM services, and defeats the purpose of the smart concatenation feature.
+
+code_context:
+  affected_files:
+    - "src/main.py"
+  affected_functions:
+    - "main()"
+  code_snippet: |
+    # Before fix: pipeline.run() creates one PDF per file
+    results = pipeline.run(verbose=args.verbose)
+    
+    # After fix: pipeline.run_smart_concatenation() groups files into max 10 PDFs
+    results = pipeline.run_smart_concatenation(
+        max_pdfs=args.max_pdfs,
+        max_pages_per_pdf=args.max_pages_per_pdf,
+        max_size_per_pdf_mb=args.max_size_per_pdf_mb,
+        max_total_pages=args.max_total_pages,
+        verbose=args.verbose
+    )
+  error_message: |
+    N/A - No error, but unexpected behavior (too many PDFs created)
+
+resolution:
+  root_cause: "The CLI defaulted to using pipeline.run() which creates one PDF per file, instead of pipeline.run_smart_concatenation() which groups files intelligently into a maximum of 10 PDFs."
+  solution: |
+    Updated src/main.py to use smart concatenation by default. Changes include:
+    1. Modified pipeline execution to use run_smart_concatenation() by default
+    2. Added --no-smart-concatenation flag to allow users to disable it if needed (preserves old behavior)
+    3. Added CLI arguments for smart concatenation parameters:
+       - --max-pdfs (default: 10)
+       - --max-pages-per-pdf (default: 100)
+       - --max-size-per-pdf-mb (default: 10)
+       - --max-total-pages (default: 1000)
+    
+    This makes CLI behavior consistent with web portal defaults and ensures users get organized PDFs without needing to know about smart concatenation.
+  fix_commit: null
+  fix_pr: null
+  github_issue: "https://github.com/MichaelWeed/sakura-sumi/issues/15"
+
+testing:
+  test_coverage:
+    has_unit_test: false
+    has_integration_test: false
+    regression_test_added: false
+
+metadata:
+  tags: ["cli", "smart-concatenation", "pdf-generation", "default-behavior"]
+  related_bugs: []
+  blocked_by: []
+  blocks: []
+
+notes: |
+  This fix makes the CLI behavior consistent with the web portal's default behavior when smart concatenation is enabled. Users can still disable smart concatenation using the --no-smart-concatenation flag if they want one PDF per file.
+
+attachments:
+  screenshots: []
+  logs: []
+  recordings: []
+
