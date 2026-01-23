@@ -138,8 +138,8 @@ def main():
     
     args = parser.parse_args()
     
-    # Validate source directory
-    source_path = Path(args.source_dir)
+    # Validate source directory and resolve to absolute path
+    source_path = Path(args.source_dir).expanduser().resolve()
     if not source_path.exists():
         print(f"\n✗ Error: Source directory does not exist: {args.source_dir}")
         print(f"   💡 Tip: Check the path and ensure the directory exists.")
@@ -152,11 +152,12 @@ def main():
         print(f"   💡 Tip: Provide the directory containing your source code files.")
         sys.exit(1)
     
-    # Set output directory
+    # Set output directory (use resolved absolute path)
     if args.output:
-        output_dir = Path(args.output)
+        output_dir = Path(args.output).expanduser().resolve()
     else:
-        output_dir = Path(f"{args.source_dir}_ocr_ready")
+        # Construct output directory next to source directory using absolute path
+        output_dir = source_path.parent / f"{source_path.name}_ocr_ready"
     
     # Create pipeline
     exclusions = set(args.exclude) if args.exclude else None
