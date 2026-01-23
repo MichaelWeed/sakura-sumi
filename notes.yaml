@@ -1,4 +1,6 @@
 notes:
+  - date: "2026-01-22"
+    summary: "Pivoted project positioning from 'compression portal' to 'Visual Token Arbitrage Engine'. Updated codebase terminology, closed resolved/duplicate GitHub issues (#3, #13, #15), updated web portal startup message. Repo description update pending manual completion due to certificate issue."
   - date: "2025-01-17"
     summary: "Prepared project for open source distribution: removed all system-specific paths and personal information, cleaned up documentation, updated examples to use generic paths."
   - date: "2025-01-17"

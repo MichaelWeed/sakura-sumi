@@ -98,7 +98,11 @@ class FileDiscovery:
         source_dir = str(source_dir).strip().strip("'\"")
         self.source_dir = Path(source_dir).expanduser().resolve()
         if not self.source_dir.exists():
-            raise ValueError(f"Source directory does not exist: {self.source_dir}")
+            raise ValueError(
+                f"Source directory does not exist: {self.source_dir}\n"
+                f"💡 Tip: Verify the path is correct and the directory exists.\n"
+                f"💡 Tip: Use an absolute path or ensure you're in the correct working directory."
+            )
         
         self.exclusions = self.DEFAULT_EXCLUSIONS.copy()
         if exclusions:
