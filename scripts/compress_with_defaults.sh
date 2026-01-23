@@ -73,7 +73,15 @@ if ! python3 -c "import reportlab" 2>/dev/null; then
 fi
 
 # Run compression with default settings (smart concatenation enabled by default)
-python3 scripts/compress.py "$SOURCE_DIR" -v
+# Capture both stdout and stderr to ensure errors are visible in Automator
+if ! python3 scripts/compress.py "$SOURCE_DIR" -v 2>&1; then
+    EXIT_CODE=$?
+    # Deactivate virtual environment if it was activated
+    if [ "$VENV_ACTIVATED" = true ]; then
+        deactivate
+    fi
+    exit $EXIT_CODE
+fi
 EXIT_CODE=$?
 
 # Deactivate virtual environment if it was activated
