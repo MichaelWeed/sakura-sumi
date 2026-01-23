@@ -6,9 +6,7 @@ import argparse
 from pathlib import Path
 
 from .compression.pipeline import CompressionPipeline
-from .compression.density_profiles import DensityProfile
 from .utils.metrics import CompressionMetrics, create_visualizations
-from .security import SecurityConfig, HookConfig
 
 
 def main():
@@ -133,34 +131,9 @@ def main():
         help='Custom key folders for smart concatenation priority (space-separated, e.g., --key-folders app core shared). Default: src, components, api, services, utils, lib, public, tests, test, specs, config, scripts'
     )
     parser.add_argument(
-        '--density-profile',
-        type=str,
-        default='machine_dense',
-        choices=['human', 'machine_dense'],
-        help='Rendering density profile: human (readable) or machine_dense (maximum density) (default: machine_dense)'
-    )
-    parser.add_argument(
         '--no-topological-sort',
         action='store_true',
         help='Disable topological sorting (use alphabetical order instead)'
-    )
-    parser.add_argument(
-        '--security-hook',
-        type=str,
-        action='append',
-        help='Security hook command (can be specified multiple times). Format: type:command (e.g., shell:./check-secrets.sh)'
-    )
-    parser.add_argument(
-        '--security-regex',
-        type=str,
-        help='Path to file containing regex patterns for security scanning (one pattern per line)'
-    )
-    parser.add_argument(
-        '--security-on-dirty',
-        type=str,
-        default='fail',
-        choices=['fail', 'redact', 'skip'],
-        help='Action when security hook detects sensitive content (default: fail)'
     )
     
     args = parser.parse_args()
@@ -185,57 +158,6 @@ def main():
     else:
         output_dir = Path(f"{args.source_dir}_ocr_ready")
     
-    # Parse density profile
-    density_profile = DensityProfile(args.density_profile)
-    
-    # Parse security configuration
-    security_config = None
-    if args.security_hook or args.security_regex:
-        hooks = []
-        
-        # Add shell command hooks
-        if args.security_hook:
-            for hook_spec in args.security_hook:
-                if ':' in hook_spec:
-                    hook_type, command = hook_spec.split(':', 1)
-                    if hook_type == 'shell':
-                        hooks.append(HookConfig(
-                            hook_type='shell',
-                            shell_command=command,
-                            on_dirty=args.security_on_dirty
-                        ))
-                    elif hook_type == 'python':
-                        # Format: python:module:function
-                        parts = command.split(':', 1)
-                        if len(parts) == 2:
-                            hooks.append(HookConfig(
-                                hook_type='python',
-                                python_module=parts[0],
-                                python_function=parts[1],
-                                on_dirty=args.security_on_dirty
-                            ))
-                else:
-                    # Default to shell command
-                    hooks.append(HookConfig(
-                        hook_type='shell',
-                        shell_command=hook_spec,
-                        on_dirty=args.security_on_dirty
-                    ))
-        
-        # Add regex hook
-        if args.security_regex:
-            hooks.append(HookConfig(
-                hook_type='regex',
-                regex_file=args.security_regex,
-                on_dirty=args.security_on_dirty
-            ))
-        
-        if hooks:
-            security_config = SecurityConfig(
-                enabled=True,
-                hooks=hooks
-            )
-    
     # Create pipeline
     exclusions = set(args.exclude) if args.exclude else None
     pipeline = CompressionPipeline(
@@ -247,9 +169,6 @@ def main():
         batch_size=args.batch_size,
         resume=args.resume,
         retry_count=args.retry,
-        density_profile=density_profile,
-        security_config=security_config,
-        topological_sort=not args.no_topological_sort,
     )
     
     # Run pipeline
