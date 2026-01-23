@@ -166,13 +166,20 @@ def main():
         # Check if this looks like a user home directory name (common usernames)
         common_home_names = ['johndoe', 'root', 'admin', 'system', 'nobody', 'daemon']
         if source_path.name.lower() in common_home_names or source_path == Path.home():
-            print(f"\n✗ Error: Invalid source directory: {source_path}")
-            print(f"   💡 Tip: The selected path appears to be a user home directory, not a project directory.")
-            print(f"   💡 Tip: This usually means the Quick Action didn't receive the correct folder path.")
-            print(f"   💡 Tip: Please try:")
-            print(f"      1. Right-click on the actual project folder (e.g., aether_-the-document-engineer)")
-            print(f"      2. Not on the Downloads folder or user folder")
-            print(f"      3. Or use the command line: ./scripts/compress_with_defaults.sh '/Users/johndoe/Downloads/aether_-the-document-engineer'")
+            error_msg = (
+                f"Error: Invalid source directory: {source_path}\n"
+                f"Tip: The selected path appears to be a user home directory, not a project directory.\n"
+                f"Tip: This usually means the Quick Action didn't receive the correct folder path.\n"
+                f"Tip: Please try:\n"
+                f"  1. Right-click on the actual project folder (e.g., aether_-the-document-engineer)\n"
+                f"  2. Not on the Downloads folder or user folder\n"
+                f"  3. Or use the command line: ./scripts/compress_with_defaults.sh '/Users/johndoe/Downloads/aether_-the-document-engineer'"
+            )
+            # Print to both stdout and stderr to ensure Automator captures it
+            print(f"\n✗ {error_msg}", file=sys.stderr)
+            print(f"\n✗ {error_msg}", file=sys.stdout)
+            sys.stderr.flush()
+            sys.stdout.flush()
             sys.exit(1)
     
     # Create pipeline
