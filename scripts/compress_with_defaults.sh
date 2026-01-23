@@ -7,9 +7,30 @@ set -e  # Exit on error
 # Get the directory passed as argument (from Finder/right-click)
 SOURCE_DIR="${1:-$(pwd)}"
 
+# Handle placeholder paths or help requests
+if [ "$SOURCE_DIR" = "/path/to/test" ] || [ "$SOURCE_DIR" = "--help" ] || [ "$SOURCE_DIR" = "-h" ]; then
+    echo "Usage: $0 [directory_path]" >&2
+    echo "" >&2
+    echo "Compresses a directory to PDFs using default settings." >&2
+    echo "" >&2
+    echo "Examples:" >&2
+    echo "  $0                          # Compress current directory" >&2
+    echo "  $0 /path/to/your/codebase  # Compress specified directory" >&2
+    echo "  $0 ~/Projects/my-project    # Compress using home directory shortcut" >&2
+    echo "" >&2
+    echo "If no directory is specified, the current directory is used." >&2
+    exit 1
+fi
+
 # Resolve to absolute path
 if [ ! -d "$SOURCE_DIR" ]; then
     echo "Error: Directory does not exist: $SOURCE_DIR" >&2
+    echo "" >&2
+    echo "💡 Tip: Make sure the path is correct. You can:" >&2
+    echo "   - Use an absolute path: /Users/yourname/Projects/myproject" >&2
+    echo "   - Use a relative path: ./myproject" >&2
+    echo "   - Use home shortcut: ~/Projects/myproject" >&2
+    echo "   - Omit the path to compress the current directory" >&2
     exit 1
 fi
 SOURCE_DIR=$(cd "$SOURCE_DIR" && pwd)
