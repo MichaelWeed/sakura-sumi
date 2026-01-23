@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Main entry point for Visual Token Arbitrage Engine."""
+"""Main entry point for OCR Compression System."""
 
 import sys
 import argparse
@@ -14,7 +14,7 @@ from .security import SecurityConfig, HookConfig
 def main():
     """Main CLI entry point."""
     parser = argparse.ArgumentParser(
-        description='🌸 Sakura Sumi - Visual Token Arbitrage Engine - Maximize AI context and intelligence through high-density visual arbitrage'
+        description='🌸 Sakura Sumi - OCR Compression System - Convert codebase to compressed PDFs for LLM analysis'
     )
     parser.add_argument(
         'source_dir',
