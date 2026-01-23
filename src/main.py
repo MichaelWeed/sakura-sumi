@@ -159,6 +159,22 @@ def main():
         # Construct output directory next to source directory using absolute path
         output_dir = source_path.parent / f"{source_path.name}_ocr_ready"
     
+    # Safety check: Detect if source path is a user home directory (common Quick Action mistake)
+    # If source is /Users/johndoe, it means the Quick Action passed the wrong path
+    restricted_parents = [Path('/Users'), Path('/System'), Path('/Library')]
+    if source_path.parent in restricted_parents:
+        # Check if this looks like a user home directory name (common usernames)
+        common_home_names = ['johndoe', 'root', 'admin', 'system', 'nobody', 'daemon']
+        if source_path.name.lower() in common_home_names or source_path == Path.home():
+            print(f"\n✗ Error: Invalid source directory: {source_path}")
+            print(f"   💡 Tip: The selected path appears to be a user home directory, not a project directory.")
+            print(f"   💡 Tip: This usually means the Quick Action didn't receive the correct folder path.")
+            print(f"   💡 Tip: Please try:")
+            print(f"      1. Right-click on the actual project folder (e.g., aether_-the-document-engineer)")
+            print(f"      2. Not on the Downloads folder or user folder")
+            print(f"      3. Or use the command line: ./scripts/compress_with_defaults.sh '/Users/johndoe/Downloads/aether_-the-document-engineer'")
+            sys.exit(1)
+    
     # Create pipeline
     exclusions = set(args.exclude) if args.exclude else None
     pipeline = CompressionPipeline(
