@@ -5,6 +5,10 @@ import sys
 import argparse
 from pathlib import Path
 
+# Force unbuffered output for better visibility in Automator
+sys.stdout.reconfigure(line_buffering=True) if hasattr(sys.stdout, 'reconfigure') else None
+sys.stderr.reconfigure(line_buffering=True) if hasattr(sys.stderr, 'reconfigure') else None
+
 from .compression.pipeline import CompressionPipeline
 from .utils.metrics import CompressionMetrics, create_visualizations
 

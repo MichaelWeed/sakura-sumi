@@ -74,15 +74,17 @@ fi
 
 # Run compression with default settings (smart concatenation enabled by default)
 # Capture both stdout and stderr to ensure errors are visible in Automator
-if ! python3 scripts/compress.py "$SOURCE_DIR" -v 2>&1; then
+# Use unbuffered Python output (-u) to ensure immediate output in Automator
+EXIT_CODE=0
+if ! python3 -u scripts/compress.py "$SOURCE_DIR" -v 2>&1; then
     EXIT_CODE=$?
+    echo "Compression failed with exit code: $EXIT_CODE" >&2
     # Deactivate virtual environment if it was activated
     if [ "$VENV_ACTIVATED" = true ]; then
         deactivate
     fi
     exit $EXIT_CODE
 fi
-EXIT_CODE=$?
 
 # Deactivate virtual environment if it was activated
 if [ "$VENV_ACTIVATED" = true ]; then
