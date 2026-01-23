@@ -4,6 +4,10 @@
 
 set -e  # Exit on error
 
+# Immediate output for Automator visibility
+echo "🌸 Sakura Sumi: Starting compression..." >&2
+echo "Received argument: ${1:-$(pwd)}" >&2
+
 # Get the directory passed as argument (from Finder/right-click)
 SOURCE_DIR="${1:-$(pwd)}"
 
@@ -23,6 +27,7 @@ if [ "$SOURCE_DIR" = "/path/to/test" ] || [ "$SOURCE_DIR" = "--help" ] || [ "$SO
 fi
 
 # Resolve to absolute path
+echo "Checking directory: $SOURCE_DIR" >&2
 if [ ! -d "$SOURCE_DIR" ]; then
     echo "Error: Directory does not exist: $SOURCE_DIR" >&2
     echo "" >&2
@@ -41,6 +46,7 @@ PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
 # Change to project root
 cd "$PROJECT_ROOT"
+echo "Project root: $PROJECT_ROOT" >&2
 
 # Activate virtual environment if it exists
 VENV_ACTIVATED=false
@@ -75,6 +81,7 @@ fi
 # Run compression with default settings (smart concatenation enabled by default)
 # Capture both stdout and stderr to ensure errors are visible in Automator
 # Use unbuffered Python output (-u) to ensure immediate output in Automator
+echo "Starting Python compression script..." >&2
 EXIT_CODE=0
 if ! python3 -u scripts/compress.py "$SOURCE_DIR" -v 2>&1; then
     EXIT_CODE=$?
