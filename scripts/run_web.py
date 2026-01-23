@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Run the web portal for OCR compression."""
+"""Run the web portal for Visual Token Arbitrage Engine."""
 
 import sys
 from pathlib import Path
@@ -14,7 +14,7 @@ def main():
     """Main entry point for web portal."""
     app = create_app()
     port = 5001  # Use 5001 to avoid conflict with macOS AirPlay
-    print("Starting 🌸 Sakura Sumi - OCR Compression Portal...")
+    print("Starting 🌸 Sakura Sumi - Visual Token Arbitrage Engine...")
     print(f"Open http://localhost:{port} in your browser")
     app.run(debug=True, host='0.0.0.0', port=port)
 

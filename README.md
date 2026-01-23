@@ -464,6 +464,13 @@ python scripts/compress.py "/path/to/codebase" \
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
+## CI/CD Status
+
+![Tests](https://github.com/MichaelWeed/sakura-sumi/workflows/Tests/badge.svg)
+![Linting](https://github.com/MichaelWeed/sakura-sumi/workflows/Linting/badge.svg)
+
+---
+
 ## Contributing
 
 Contributions welcome! Please see `CONTRIBUTING.md` for:

@@ -4,7 +4,7 @@ import sys
 import json
 import signal
 from pathlib import Path
-from typing import List, Optional, Dict, Any, Callable
+from typing import List, Optional, Dict, Any, Callable, Set
 from datetime import datetime
 from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor, as_completed
 from multiprocessing import cpu_count
@@ -505,6 +505,7 @@ class CompressionPipeline:
         max_pages_per_pdf: int = 100,
         max_size_per_pdf_mb: int = 10,
         max_total_pages: int = 1000,
+        key_folders: Optional[Set[str]] = None,
         verbose: bool = True,
     ) -> dict:
         """
@@ -516,6 +517,7 @@ class CompressionPipeline:
             max_pages_per_pdf: Maximum pages per individual PDF
             max_size_per_pdf_mb: Maximum size per PDF in MB
             max_total_pages: Maximum total pages across all PDFs
+            key_folders: Custom set of key folder names for priority grouping (default: uses built-in defaults)
             verbose: Print progress information
             
         Returns:
@@ -598,6 +600,7 @@ class CompressionPipeline:
             max_pages_per_pdf=max_pages_per_pdf,
             max_size_per_pdf_mb=max_size_per_pdf_mb,
             max_total_pages=max_total_pages,
+            key_folders=key_folders,
         )
         
         pdf_groups = engine.group_files(files)
