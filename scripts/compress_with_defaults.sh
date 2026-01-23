@@ -55,7 +55,17 @@ fi
 # Check if required Python packages are installed
 if ! python3 -c "import reportlab" 2>/dev/null; then
     echo "Error: Required dependencies not installed." >&2
-    echo "Please run: pip install -r requirements.txt" >&2
+    echo "" >&2
+    if [ "$VENV_ACTIVATED" = true ]; then
+        echo "Virtual environment is activated, but dependencies are missing." >&2
+        echo "Please run:" >&2
+        echo "  pip install -r requirements.txt" >&2
+    else
+        echo "No virtual environment found. Please:" >&2
+        echo "  1. Create venv: python3 -m venv venv" >&2
+        echo "  2. Activate it: source venv/bin/activate" >&2
+        echo "  3. Install deps: pip install -r requirements.txt" >&2
+    fi
     if [ "$VENV_ACTIVATED" = true ]; then
         deactivate
     fi
