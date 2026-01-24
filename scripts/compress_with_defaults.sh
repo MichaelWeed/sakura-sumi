@@ -4,28 +4,38 @@
 
 set -e  # Exit on error
 
+# Create log directory and file for debugging
+LOG_DIR="$HOME/Library/Logs"
+LOG_FILE="$LOG_DIR/sakura-sumi-quick-action.log"
+mkdir -p "$LOG_DIR"
+
+# Log function that writes to both stderr and log file
+log() {
+    echo "$(date '+%Y-%m-%d %H:%M:%S') - $*" | tee -a "$LOG_FILE" >&2
+}
+
 # Immediate output for Automator visibility
-echo "🌸 Sakura Sumi: Starting compression..." >&2
-echo "Number of arguments: $#" >&2
-echo "All arguments: $@" >&2
-echo "Argument 1: '${1:-none}'" >&2
+log "🌸 Sakura Sumi: Starting compression..."
+log "Number of arguments: $#"
+log "All arguments: $@"
+log "Argument 1: '${1:-none}'"
 
 # Get the directory passed as argument (from Finder/right-click)
 # Automator may pass paths in different ways - handle multiple cases
 if [ $# -eq 0 ]; then
     # No arguments - use current directory
     SOURCE_DIR="$(pwd)"
-    echo "No arguments provided, using current directory: $SOURCE_DIR" >&2
+    log "No arguments provided, using current directory: $SOURCE_DIR"
 elif [ $# -eq 1 ]; then
     # Single argument - use it directly
     SOURCE_DIR="$1"
-    echo "Using single argument: $SOURCE_DIR" >&2
+    log "Using single argument: $SOURCE_DIR"
 else
     # Multiple arguments - Automator might pass each file/folder separately
     # For Quick Actions on folders, take the first one
     SOURCE_DIR="$1"
-    echo "Multiple arguments provided, using first: $SOURCE_DIR" >&2
-    echo "All provided paths: $@" >&2
+    log "Multiple arguments provided, using first: $SOURCE_DIR"
+    log "All provided paths: $@"
 fi
 
 # Handle placeholder paths or help requests
@@ -44,7 +54,7 @@ if [ "$SOURCE_DIR" = "/path/to/test" ] || [ "$SOURCE_DIR" = "--help" ] || [ "$SO
 fi
 
 # Resolve to absolute path
-echo "Checking directory: '$SOURCE_DIR'" >&2
+log "Checking directory: '$SOURCE_DIR'"
 
 # Handle special characters and spaces in path
 # Remove any quotes that might have been added
@@ -110,11 +120,11 @@ fi
 # Run compression with default settings (smart concatenation enabled by default)
 # Capture both stdout and stderr to ensure errors are visible in Automator
 # Use unbuffered Python output (-u) to ensure immediate output in Automator
-echo "Starting Python compression script..." >&2
+log "Starting Python compression script..."
 EXIT_CODE=0
-if ! python3 -u scripts/compress.py "$SOURCE_DIR" -v 2>&1; then
+if ! python3 -u scripts/compress.py "$SOURCE_DIR" -v 2>&1 | tee -a "$LOG_FILE"; then
     EXIT_CODE=$?
-    echo "Compression failed with exit code: $EXIT_CODE" >&2
+    log "Compression failed with exit code: $EXIT_CODE"
     # Deactivate virtual environment if it was activated
     if [ "$VENV_ACTIVATED" = true ]; then
         deactivate
