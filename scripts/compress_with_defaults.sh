@@ -122,7 +122,10 @@ fi
 # Use unbuffered Python output (-u) to ensure immediate output in Automator
 log "Starting Python compression script..."
 EXIT_CODE=0
-if ! python3 -u scripts/compress.py "$SOURCE_DIR" -v 2>&1 | tee -a "$LOG_FILE"; then
+if python3 -u scripts/compress.py "$SOURCE_DIR" -v 2>&1 | tee -a "$LOG_FILE"; then
+    EXIT_CODE=0
+    log "Compression completed successfully (exit code: $EXIT_CODE)"
+else
     EXIT_CODE=$?
     log "Compression failed with exit code: $EXIT_CODE"
     # Deactivate virtual environment if it was activated
