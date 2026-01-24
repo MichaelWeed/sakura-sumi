@@ -21,6 +21,8 @@ If your Quick Action appears to do nothing when you right-click on a folder, fol
      ./scripts/compress_with_defaults.sh "$@"
      ```
 
+**IMPORTANT:** The `"$@"` is critical - it passes all selected items as separate arguments. Without it, the script won't receive the folder path.
+
 ## Step 2: Check for Log File
 
 The script now creates a log file you can check:
