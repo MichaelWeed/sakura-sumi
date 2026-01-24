@@ -77,7 +77,7 @@ fi
 
 # Resolve to absolute path (handles symlinks and relative paths)
 SOURCE_DIR=$(cd "$SOURCE_DIR" && pwd)
-echo "Resolved to absolute path: $SOURCE_DIR" >&2
+log "Resolved to absolute path: $SOURCE_DIR"
 
 # Get script directory and project root
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
