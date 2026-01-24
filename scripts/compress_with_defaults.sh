@@ -6,10 +6,27 @@ set -e  # Exit on error
 
 # Immediate output for Automator visibility
 echo "🌸 Sakura Sumi: Starting compression..." >&2
-echo "Received argument: ${1:-$(pwd)}" >&2
+echo "Number of arguments: $#" >&2
+echo "All arguments: $@" >&2
+echo "Argument 1: '${1:-none}'" >&2
 
 # Get the directory passed as argument (from Finder/right-click)
-SOURCE_DIR="${1:-$(pwd)}"
+# Automator may pass paths in different ways - handle multiple cases
+if [ $# -eq 0 ]; then
+    # No arguments - use current directory
+    SOURCE_DIR="$(pwd)"
+    echo "No arguments provided, using current directory: $SOURCE_DIR" >&2
+elif [ $# -eq 1 ]; then
+    # Single argument - use it directly
+    SOURCE_DIR="$1"
+    echo "Using single argument: $SOURCE_DIR" >&2
+else
+    # Multiple arguments - Automator might pass each file/folder separately
+    # For Quick Actions on folders, take the first one
+    SOURCE_DIR="$1"
+    echo "Multiple arguments provided, using first: $SOURCE_DIR" >&2
+    echo "All provided paths: $@" >&2
+fi
 
 # Handle placeholder paths or help requests
 if [ "$SOURCE_DIR" = "/path/to/test" ] || [ "$SOURCE_DIR" = "--help" ] || [ "$SOURCE_DIR" = "-h" ]; then
@@ -27,9 +44,18 @@ if [ "$SOURCE_DIR" = "/path/to/test" ] || [ "$SOURCE_DIR" = "--help" ] || [ "$SO
 fi
 
 # Resolve to absolute path
-echo "Checking directory: $SOURCE_DIR" >&2
+echo "Checking directory: '$SOURCE_DIR'" >&2
+
+# Handle special characters and spaces in path
+# Remove any quotes that might have been added
+SOURCE_DIR=$(echo "$SOURCE_DIR" | sed "s/^['\"]//; s/['\"]$//")
+
+# Expand ~ if present
+SOURCE_DIR="${SOURCE_DIR/#\~/$HOME}"
+
 if [ ! -d "$SOURCE_DIR" ]; then
-    echo "Error: Directory does not exist: $SOURCE_DIR" >&2
+    echo "Error: Directory does not exist: '$SOURCE_DIR'" >&2
+    echo "Resolved path: $(cd "$SOURCE_DIR" 2>&1 && pwd || echo 'failed')" >&2
     echo "" >&2
     echo "💡 Tip: Make sure the path is correct. You can:" >&2
     echo "   - Use an absolute path: /Users/yourname/Projects/myproject" >&2
@@ -38,7 +64,10 @@ if [ ! -d "$SOURCE_DIR" ]; then
     echo "   - Omit the path to compress the current directory" >&2
     exit 1
 fi
+
+# Resolve to absolute path (handles symlinks and relative paths)
 SOURCE_DIR=$(cd "$SOURCE_DIR" && pwd)
+echo "Resolved to absolute path: $SOURCE_DIR" >&2
 
 # Get script directory and project root
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
