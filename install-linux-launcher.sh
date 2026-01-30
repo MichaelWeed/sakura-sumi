@@ -4,7 +4,7 @@
 
 set -e
 PROJECT_ROOT="$(cd "$(dirname "$0")" && pwd)"
-LAUNCHER="$PROJECT_ROOT/Launch Sakura Sumi.sh"
+LAUNCHER="$PROJECT_ROOT/Sakura Sumi.sh"
 mkdir -p "$HOME/.local/share/applications"
 DESKTOP="$HOME/.local/share/applications/sakura-sumi.desktop"
 
@@ -20,4 +20,4 @@ Categories=Development;Utility;
 EOF
 
 echo "Installed. You can now launch 'Sakura Sumi' from your application menu."
-echo "Or double-click 'Launch Sakura Sumi.sh' in this folder."
+echo "Or double-click 'Sakura Sumi.sh' in this folder."
