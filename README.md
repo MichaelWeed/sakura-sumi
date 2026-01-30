@@ -79,13 +79,13 @@ PDFs show up in a folder named `{your_codebase}_ocr_ready/`.
 
 No terminal needed. Double-click the right file for your OS; it will create a venv and install deps if needed, then open the web portal (and your browser).
 
-| OS      | File                          |
-|---------|-------------------------------|
-| macOS   | `Launch Sakura Sumi.command`  |
-| Windows | `Launch Sakura Sumi.bat`      |
-| Linux   | `Launch Sakura Sumi.sh`       |
+| OS      | File                     |
+|---------|--------------------------|
+| macOS   | `Sakura Sumi.command`    |
+| Windows | `Sakura Sumi.bat`        |
+| Linux   | `Sakura Sumi.sh`         |
 
-On Linux, make sure the script is executable (`chmod +x "Launch Sakura Sumi.sh"`). To add it to your application menu, run `./install-linux-launcher.sh` once.
+On Linux, make sure the script is executable (`chmod +x "Sakura Sumi.sh"`). To add it to your application menu, run `./install-linux-launcher.sh` once.
 
 **CLI usage:**
 ```bash
