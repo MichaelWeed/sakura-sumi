@@ -34,6 +34,10 @@ if errorlevel 1 (
 REM Start browser after a short delay
 start /b cmd /c "timeout /t 3 /nobreak >nul && start http://localhost:5001"
 
-venv\Scripts\python.exe scripts\run_web.py
-if errorlevel 1 pause
+echo Sakura Sumi running at http://localhost:5001 — Ctrl+C to quit.
+venv\Scripts\python.exe scripts\run_web.py >> sakura-sumi-web.log 2>&1
+if errorlevel 1 (
+    type sakura-sumi-web.log
+    pause
+)
 endlocal

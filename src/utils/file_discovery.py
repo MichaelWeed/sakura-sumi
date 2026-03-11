@@ -75,6 +75,7 @@ class FileDiscovery:
         'gradle',
         'bin',
         'obj',
+        'target',   # Rust/Cargo build output (like dist/build for JS)
         '.next',
         '.nuxt',
         'coverage',
