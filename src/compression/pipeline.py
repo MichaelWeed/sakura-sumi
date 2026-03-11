@@ -457,7 +457,7 @@ class CompressionPipeline:
         print(f"PDF:      {pdf['estimated_tokens']:,} tokens ({self._format_size(pdf['total_size_bytes'])})")
         print(f"Token Compression: {pdf['token_compression_ratio']:.2f}x")
         print(f"Token Savings: {pdf['token_savings']:,} ({pdf['token_savings_percent']:.1f}%)")
-        print(f"\nGemini Compatibility:")
+        print("\nGemini Compatibility:")
         print(f"  Context Limit: {gemini['context_limit']:,} tokens")
         print(f"  PDF Fits: {'✅ Yes' if gemini['fits_pdf'] else '❌ No'}")
         if gemini.get('pdf_usage_percent'):
@@ -484,7 +484,7 @@ class CompressionPipeline:
         print(f"Files Failed: {results['summary']['files_failed']}")
         if results['summary']['files_already_processed'] > 0:
             print(f"Files Already Processed: {results['summary']['files_already_processed']}")
-        print(f"\nSize Statistics:")
+        print("\nSize Statistics:")
         print(f"  Original: {self._format_size(results['summary']['total_size_original_bytes'])}")
         print(f"  PDF:      {self._format_size(results['summary']['total_size_pdf_bytes'])}")
         print(f"  Ratio:    {results['summary']['compression_ratio']:.2f}x")
@@ -566,7 +566,7 @@ class CompressionPipeline:
                 error_message = (
                     "No files discovered in the specified directory. "
                     "Please ensure the directory contains supported source code files. "
-                    f"See https://github.com/MichaelWeed/sakura-sumi#file-type-support for supported types."
+                    "See https://github.com/MichaelWeed/sakura-sumi#file-type-support for supported types."
                 )
             
             if verbose:
@@ -605,7 +605,7 @@ class CompressionPipeline:
         pdf_groups = engine.group_files(files)
         
         if verbose:
-            print(f"\nSmart Concatenation Plan:")
+            print("\nSmart Concatenation Plan:")
             print(f"Total files discovered: {len(files)}")
             print(f"Total directories found: {len(set(str(Path(f.relative_path).parent) if len(Path(f.relative_path).parts) > 1 else '' for f in files))}")
             print(f"Total PDFs to create: {len(pdf_groups)}")
@@ -652,7 +652,7 @@ class CompressionPipeline:
                 })
         
         if verbose:
-            print(f"\n\nSmart concatenation complete!")
+            print("\n\nSmart concatenation complete!")
             if self.cancelled:
                 print("⚠️  Processing was cancelled.")
         
