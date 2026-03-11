@@ -33,4 +33,5 @@ htmlcov/
 # Project specific
 *.log
 telemetry.log
+sakura-sumi-web.log
 failed_files.json

@@ -421,11 +421,11 @@ class PDFConverter:
                 self.conversion_stats['total_size_original'] += total_size_original
                 self.conversion_stats['total_size_pdf'] += pdf_size
                 
-                # Log if files were skipped due to size limit
+                # Track files skipped due to size limit (informational only; not an error)
                 if files_skipped_size_limit > 0:
-                    self.conversion_stats['errors'].append({
+                    self.conversion_stats.setdefault('warnings', []).append({
                         'pdf': pdf_name,
-                        'warning': f'{files_skipped_size_limit} files skipped due to size limit ({max_size_bytes / (1024*1024):.1f} MB)'
+                        'message': f'{files_skipped_size_limit} files skipped due to size limit ({max_size_bytes / (1024*1024):.1f} MB)'
                     })
                 
                 return pdf_path

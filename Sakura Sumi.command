@@ -20,5 +20,7 @@ fi
 # Open browser after a short delay (non-blocking)
 (sleep 2; open "http://localhost:5001" 2>/dev/null) &
 
-# Run web portal
-exec python3 scripts/run_web.py
+# Run web portal (output to log so terminal stays silent)
+LOG_FILE="$PROJECT_ROOT/sakura-sumi-web.log"
+echo "Sakura Sumi running at http://localhost:5001 — Ctrl+C to quit."
+exec python3 scripts/run_web.py >> "$LOG_FILE" 2>&1

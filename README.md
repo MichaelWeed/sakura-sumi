@@ -2,9 +2,9 @@
 
 ![Sakura Sumi](flag.jpg)
 
-Turns a codebase into compressed PDFs you can feed into LLMs. Handy when you want to throw a whole project at something like Gemini—you get 7–20x token compression so big repos fit in a 2M-token context.
+🌸 Sakura Sumi - Visual Token Arbitrage Engine transforms raw source code into high-density visual tokens for LLM context maximization. Achieve 7–20x token compression, letting entire repositories fit comfortably inside a 2M-token context window with perfect retrieval.
 
-It discovers source files, converts them to dense PDFs (small fonts, tight margins), and can run in parallel or resume after a crash. There’s a web UI, optional OCR-based compression, token estimates, and basic reporting. See [File Type Support](#file-type-support) for what gets included and what’s skipped.
+The engine discovers files, applies deterministic arbitrage algorithms to maximize information density, and generates vision-optimized PDFs. Features include multi-worker parallelization, a beautiful Sakura-themed Web UI, DeepSeek-OCR integration, and a dedicated "Prompt Collector" for text fragments. See [Arbitrage Methodology](#arbitrage-methodology) for technical details.
 
 ## File Type Support
 
