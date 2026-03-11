@@ -1,6 +1,5 @@
 """Dense PDF conversion engine for codebase compression."""
 
-import os
 import json
 import html
 from pathlib import Path
@@ -10,7 +9,6 @@ from reportlab.lib.units import inch
 from reportlab.pdfgen import canvas
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
-from reportlab.lib.enums import TA_LEFT
 import yaml
 
 from ..utils.file_discovery import FileInfo
@@ -259,7 +257,7 @@ class PDFConverter:
             
             return pdf_path
         
-        except Exception as e:
+        except Exception:
             # Fallback to simpler canvas-based approach if SimpleDocTemplate fails
             try:
                 return self._generate_pdf_simple(file_info, content, pdf_path)
