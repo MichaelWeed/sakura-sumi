@@ -20,7 +20,7 @@ if requirements_file.exists():
 setup(
     name='ocr-compression',
     version='1.0.0',
-    description='🌸 Sakura Sumi - OCR Compression System - Convert codebases to compressed PDFs for LLM analysis',
+    description='🌸 Sakura Sumi - Visual Token Arbitrage Engine - Maximize AI context and intelligence through high-density visual arbitrage',
     long_description=long_description,
     long_description_content_type='text/markdown',
     author='Sakura Sumi Contributors',
@@ -32,7 +32,7 @@ setup(
     install_requires=requirements,
     entry_points={
         'console_scripts': [
-            'ocr-compress=src.main:main',
+            'ocr-compress=main:main',
             'ocr-web=scripts.run_web:main',
         ],
     },
