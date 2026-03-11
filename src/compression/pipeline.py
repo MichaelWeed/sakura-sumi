@@ -1,6 +1,5 @@
 """Main compression pipeline orchestrator with enhanced batch processing."""
 
-import sys
 import json
 import signal
 from pathlib import Path
@@ -303,7 +302,7 @@ class CompressionPipeline:
                 error_message = (
                     "No files discovered in the specified directory. "
                     "Please ensure the directory contains supported source code files. "
-                    f"See https://github.com/MichaelWeed/sakura-sumi#file-type-support for supported types."
+                    "See https://github.com/MichaelWeed/sakura-sumi#file-type-support for supported types."
                 )
             
             if verbose:
@@ -378,7 +377,7 @@ class CompressionPipeline:
                     pbar.close()
         
         if verbose:
-            print(f"\n\nConversion complete!")
+            print("\n\nConversion complete!")
             if self.cancelled:
                 print("⚠️  Processing was cancelled. Checkpoint saved.")
         
