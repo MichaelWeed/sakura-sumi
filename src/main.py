@@ -5,12 +5,13 @@ import sys
 import argparse
 from pathlib import Path
 
+from .compression.pipeline import CompressionPipeline
+from .utils.metrics import create_visualizations
+
+
 # Force unbuffered output for better visibility in Automator
 sys.stdout.reconfigure(line_buffering=True) if hasattr(sys.stdout, 'reconfigure') else None
 sys.stderr.reconfigure(line_buffering=True) if hasattr(sys.stderr, 'reconfigure') else None
-
-from .compression.pipeline import CompressionPipeline
-from .utils.metrics import CompressionMetrics, create_visualizations
 
 
 def main():
@@ -146,8 +147,8 @@ def main():
     source_path = Path(args.source_dir).expanduser().resolve()
     if not source_path.exists():
         print(f"\n✗ Error: Source directory does not exist: {args.source_dir}")
-        print(f"   💡 Tip: Check the path and ensure the directory exists.")
-        print(f"   💡 Tip: Use an absolute path or ensure you're in the correct working directory.")
+        print("   💡 Tip: Check the path and ensure the directory exists.")
+        print("   💡 Tip: Use an absolute path or ensure you're in the correct working directory.")
         sys.exit(1)
     
     if not source_path.is_dir():
