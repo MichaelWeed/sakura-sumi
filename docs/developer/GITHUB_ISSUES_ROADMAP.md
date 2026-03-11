@@ -264,6 +264,32 @@ Various UI/UX improvements based on user feedback and best practices.
 
 ---
 
+#### Issue #11: Cross-Platform Launcher Scripts
+**Labels**: `enhancement`, `dx`, `launcher`, `priority:medium`  
+**Priority**: Medium  
+**Estimated Effort**: 2-3 hours
+
+**Description:**
+Create one-command launch scripts for both CLI and web flows so users can start Sakura Sumi without remembering long Python commands.
+
+**Motivation:**
+Lower the barrier for less-technical users and reduce repeated setup steps while avoiding antivirus false positives caused by bundled binaries.
+
+**Tasks:**
+- [ ] Add `launch_sakura.sh` and `launch_sakura.bat` wrappers that activate the local venv (if present) and run `python scripts/compress.py`
+- [ ] Add `launch_sakura_web.sh` and `launch_sakura_web.bat` wrappers for the web portal (`python scripts/run_web.py`)
+- [ ] Detect missing Python/venv gracefully and print actionable guidance
+- [ ] Document the new launchers in `README.md` and `docs/user/USAGE_GUIDE.md`
+- [ ] Add smoke tests (or CI snippets) to ensure wrappers stay executable
+
+**Acceptance Criteria:**
+- Launcher scripts work on macOS/Linux (`.sh`) and Windows (`.bat`)
+- Scripts avoid packing binaries, minimizing antivirus flags
+- Users can run both CLI and web portal via a single command per platform
+- Documentation explains usage and troubleshooting for the launchers
+
+---
+
 ## Issue Template Structure
 
 When creating issues, use this template:

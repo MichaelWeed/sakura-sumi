@@ -1,0 +1,23 @@
+"""Run the web portal for 🌸 Sakura Sumi - Visual Token Arbitrage Engine."""
+
+import sys
+from pathlib import Path
+
+# Add project root to path if running directly
+if __name__ == '__main__':
+    project_root = Path(__file__).parent.parent.parent
+    sys.path.insert(0, str(project_root))
+
+from ..web.app import create_app
+
+def main():
+    """Main entry point for web portal."""
+    app = create_app()
+    port = 5001  # Use 5001 to avoid conflict with macOS AirPlay
+    print("Starting 🌸 Sakura Sumi - Visual Token Arbitrage Engine...")
+    print(f"Open http://localhost:{port} in your browser")
+    app.run(debug=True, host='0.0.0.0', port=port)
+
+if __name__ == '__main__':
+    main()
+

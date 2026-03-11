@@ -23,8 +23,8 @@ class SmartConcatenationEngine:
     Ensures exactly 10 PDFs maximum, including root files in the count.
     """
     
-    # Key project folders that get priority
-    KEY_FOLDERS = {
+    # Default key project folders that get priority
+    DEFAULT_KEY_FOLDERS = {
         'src', 'components', 'api', 'services', 'utils', 'lib', 
         'public', 'tests', 'test', 'specs', 'config', 'scripts'
     }
@@ -36,12 +36,15 @@ class SmartConcatenationEngine:
         max_pages_per_pdf: int = 100,
         max_size_per_pdf_mb: int = 10,
         max_total_pages: int = 10,
+        key_folders: Optional[Set[str]] = None,
     ):
         self.source_dir = source_dir
         self.max_pdfs = max_pdfs
         self.max_pages_per_pdf = max_pages_per_pdf
         self.max_size_per_pdf_bytes = max_size_per_pdf_mb * 1024 * 1024
         self.max_total_pages = max_total_pages
+        # Use custom key folders if provided, otherwise use defaults
+        self.key_folders = set(key_folders) if key_folders else self.DEFAULT_KEY_FOLDERS.copy()
     
     def build_directory_tree(self, files: List[FileInfo]) -> Tuple[Dict[str, List[FileInfo]], List[FileInfo]]:
         """
@@ -75,7 +78,7 @@ class SmartConcatenationEngine:
             
             # Get first component (top-level folder)
             parts = dir_path.split('/')
-            if parts and parts[0] in self.KEY_FOLDERS:
+            if parts and parts[0] in self.key_folders:
                 key_folders.add(parts[0])
         
         return key_folders
@@ -89,7 +92,7 @@ class SmartConcatenationEngine:
         
         # Key folders get high priority
         parts = dir_path.split('/') if dir_path else []
-        if parts and parts[0] in self.KEY_FOLDERS:
+        if parts and parts[0] in self.key_folders:
             priority += 1000
         
         # Deeper directories get higher priority (we want to preserve granularity)

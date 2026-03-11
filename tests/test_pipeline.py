@@ -87,7 +87,7 @@ def test_pipeline_no_files(temp_output):
         )
         results = pipeline.run(verbose=False)
         assert results['success'] is False
-        assert results['error'] == 'No files discovered'
+        assert results['error'] == 'No files discovered in the specified directory. Please ensure the directory contains supported source code files. See https://github.com/MichaelWeed/sakura-sumi#file-type-support for supported types.'
 
 
 def test_pipeline_checkpoint_recovery(temp_codebase, temp_output):

@@ -1,63 +1,22 @@
-# Contributing to 🌸 Sakura Sumi
+# Contributing
 
-Thank you for your interest in contributing to Sakura Sumi! This document provides guidelines and instructions for contributing.
+Fork, clone, then:
 
-## Getting Started
+```bash
+python3 -m venv venv
+source venv/bin/activate   # or venv\Scripts\activate on Windows
+pip install -r requirements.txt
+pip install pytest pytest-cov
+```
 
-1. Fork the repository
-2. Clone your fork: `git clone <your-fork-url>`
-3. Create a virtual environment: `python3 -m venv venv`
-4. Activate it: `source venv/bin/activate` (macOS/Linux) or `venv\Scripts\activate` (Windows)
-5. Install dependencies: `pip install -r requirements.txt`
-6. Install development dependencies: `pip install pytest pytest-cov`
+Code: PEP 8, type hints where it helps, docstrings on public APIs. Keep functions small.
 
-## Development Guidelines
+Tests: add them for new behavior, run with `pytest tests/`. Coverage: `pytest --cov=src tests/`. Everything should pass before you open a PR.
 
-### Code Style
+Bugs: we use the `bugs/` dir with `BUG-XXX.yaml` files. Use the template there; include steps, expected vs actual, and your environment.
 
-- Follow PEP 8 for Python code
-- Use type hints where appropriate
-- Write docstrings for all public functions and classes
-- Keep functions focused and single-purpose
+PRs: branch from `main`, make your change, run tests, update docs if needed, then open a PR with a clear description. Mention bug IDs if it fixes one.
 
-### Testing
+Commits: clear messages. Prefer “Fix BUG-XXX: short description” when applicable.
 
-- Write tests for new features
-- Ensure all tests pass: `pytest tests/`
-- Run with coverage: `pytest --cov=src tests/`
-- Aim for high test coverage on new code
-
-### Bug Reports
-
-- Use the bug tracking system in `bugs/` directory
-- Create a new `BUG-XXX.yaml` file following the template
-- Include steps to reproduce, expected vs actual behavior
-- Provide environment details (OS, Python version, etc.)
-
-### Pull Requests
-
-1. Create a feature branch: `git checkout -b feature/your-feature-name`
-2. Make your changes
-3. Write or update tests
-4. Ensure all tests pass
-5. Update documentation if needed
-6. Submit a pull request with a clear description
-
-### Commit Messages
-
-- Use clear, descriptive commit messages
-- Reference bug numbers if applicable: `Fix BUG-XXX: description`
-- Keep commits focused and atomic
-
-## Project Structure
-
-- `src/` - Source code
-- `tests/` - Test suite
-- `docs/` - Documentation
-- `bugs/` - Bug tracking files
-- `config/` - Configuration templates
-
-## Questions?
-
-Open an issue on GitHub for questions or clarifications.
-
+Questions: open an issue.

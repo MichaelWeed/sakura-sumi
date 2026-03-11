@@ -1,12 +1,11 @@
 """Main compression pipeline orchestrator with enhanced batch processing."""
 
-import sys
 import json
 import signal
 from pathlib import Path
-from typing import List, Optional, Dict, Any, Callable
+from typing import List, Optional, Dict, Any, Callable, Set
 from datetime import datetime
-from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor, as_completed
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from multiprocessing import cpu_count
 import time
 
@@ -16,7 +15,7 @@ except ImportError:
     tqdm = None
 
 from ..utils.file_discovery import FileDiscovery, FileInfo
-from ..utils.metrics import CompressionMetrics, create_visualizations
+from ..utils.metrics import CompressionMetrics
 from ..utils.telemetry import TelemetryLogger
 from .pdf_converter import PDFConverter
 
@@ -303,7 +302,7 @@ class CompressionPipeline:
                 error_message = (
                     "No files discovered in the specified directory. "
                     "Please ensure the directory contains supported source code files. "
-                    f"See https://github.com/MichaelWeed/sakura-sumi#file-type-support for supported types."
+                    "See https://github.com/MichaelWeed/sakura-sumi#file-type-support for supported types."
                 )
             
             if verbose:
@@ -378,7 +377,7 @@ class CompressionPipeline:
                     pbar.close()
         
         if verbose:
-            print(f"\n\nConversion complete!")
+            print("\n\nConversion complete!")
             if self.cancelled:
                 print("⚠️  Processing was cancelled. Checkpoint saved.")
         
@@ -458,7 +457,7 @@ class CompressionPipeline:
         print(f"PDF:      {pdf['estimated_tokens']:,} tokens ({self._format_size(pdf['total_size_bytes'])})")
         print(f"Token Compression: {pdf['token_compression_ratio']:.2f}x")
         print(f"Token Savings: {pdf['token_savings']:,} ({pdf['token_savings_percent']:.1f}%)")
-        print(f"\nGemini Compatibility:")
+        print("\nGemini Compatibility:")
         print(f"  Context Limit: {gemini['context_limit']:,} tokens")
         print(f"  PDF Fits: {'✅ Yes' if gemini['fits_pdf'] else '❌ No'}")
         if gemini.get('pdf_usage_percent'):
@@ -485,7 +484,7 @@ class CompressionPipeline:
         print(f"Files Failed: {results['summary']['files_failed']}")
         if results['summary']['files_already_processed'] > 0:
             print(f"Files Already Processed: {results['summary']['files_already_processed']}")
-        print(f"\nSize Statistics:")
+        print("\nSize Statistics:")
         print(f"  Original: {self._format_size(results['summary']['total_size_original_bytes'])}")
         print(f"  PDF:      {self._format_size(results['summary']['total_size_pdf_bytes'])}")
         print(f"  Ratio:    {results['summary']['compression_ratio']:.2f}x")
@@ -505,6 +504,7 @@ class CompressionPipeline:
         max_pages_per_pdf: int = 100,
         max_size_per_pdf_mb: int = 10,
         max_total_pages: int = 1000,
+        key_folders: Optional[Set[str]] = None,
         verbose: bool = True,
     ) -> dict:
         """
@@ -516,6 +516,7 @@ class CompressionPipeline:
             max_pages_per_pdf: Maximum pages per individual PDF
             max_size_per_pdf_mb: Maximum size per PDF in MB
             max_total_pages: Maximum total pages across all PDFs
+            key_folders: Custom set of key folder names for priority grouping (default: uses built-in defaults)
             verbose: Print progress information
             
         Returns:
@@ -565,7 +566,7 @@ class CompressionPipeline:
                 error_message = (
                     "No files discovered in the specified directory. "
                     "Please ensure the directory contains supported source code files. "
-                    f"See https://github.com/MichaelWeed/sakura-sumi#file-type-support for supported types."
+                    "See https://github.com/MichaelWeed/sakura-sumi#file-type-support for supported types."
                 )
             
             if verbose:
@@ -598,12 +599,13 @@ class CompressionPipeline:
             max_pages_per_pdf=max_pages_per_pdf,
             max_size_per_pdf_mb=max_size_per_pdf_mb,
             max_total_pages=max_total_pages,
+            key_folders=key_folders,
         )
         
         pdf_groups = engine.group_files(files)
         
         if verbose:
-            print(f"\nSmart Concatenation Plan:")
+            print("\nSmart Concatenation Plan:")
             print(f"Total files discovered: {len(files)}")
             print(f"Total directories found: {len(set(str(Path(f.relative_path).parent) if len(Path(f.relative_path).parts) > 1 else '' for f in files))}")
             print(f"Total PDFs to create: {len(pdf_groups)}")
@@ -650,7 +652,7 @@ class CompressionPipeline:
                 })
         
         if verbose:
-            print(f"\n\nSmart concatenation complete!")
+            print("\n\nSmart concatenation complete!")
             if self.cancelled:
                 print("⚠️  Processing was cancelled.")
         

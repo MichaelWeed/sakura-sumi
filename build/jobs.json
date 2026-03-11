@@ -7376,7 +7376,712 @@
           "model_version": "DeepSeek-OCR v2.0"
         }
       }
+    },
+    "job_19_1769752342": {
+      "id": "job_19_1769752342",
+      "status": "completed",
+      "source_dir": "Atlas-G Protocol",
+      "mode": "code",
+      "output_dir": "/Users/johndoe/Projects/Atlas-G Protocol_ocr_ready",
+      "created_at": "2026-01-29T21:52:22.907744",
+      "progress": 100,
+      "message": "Compression complete",
+      "results": {
+        "success": true,
+        "cancelled": false,
+        "source_directory": "Atlas-G Protocol",
+        "output_directory": "Atlas-G Protocol_ocr_ready",
+        "duration_seconds": 1.646166,
+        "discovery": {
+          "source_directory": "Atlas-G Protocol",
+          "scan_date": "2026-01-29T21:52:24.568533",
+          "statistics": {
+            "total_files": 67,
+            "by_type": {
+              "json": 8,
+              "no-extension": 4,
+              "toml": 1,
+              "md": 8,
+              "html": 1,
+              "js": 1,
+              "ts": 4,
+              "tsx": 7,
+              "css": 7,
+              "py": 23,
+              "yaml": 1,
+              "txt": 2
+            },
+            "by_category": {
+              "config": 10,
+              "other": 4,
+              "documentation": 3,
+              "markup": 8,
+              "source": 35,
+              "style": 7
+            },
+            "total_size": 343717,
+            "unsupported_files": {
+              ".lock": 1,
+              ".mov": 2,
+              ".example": 1,
+              ".svg": 2
+            },
+            "total_scanned": 74
+          },
+          "files": [
+            {
+              "path": "mcp_config.json",
+              "size": 3560,
+              "type": "json",
+              "category": "config"
+            },
+            {
+              "path": "Dockerfile",
+              "size": 2415,
+              "type": "no-extension",
+              "category": "other"
+            },
+            {
+              "path": "pyproject.toml",
+              "size": 1039,
+              "type": "toml",
+              "category": "config"
+            },
+            {
+              "path": "README.md",
+              "size": 6030,
+              "type": "md",
+              "category": "documentation"
+            },
+            {
+              "path": ".gitignore",
+              "size": 570,
+              "type": "no-extension",
+              "category": "other"
+            },
+            {
+              "path": "NOTES.MD",
+              "size": 832,
+              "type": "md",
+              "category": "markup"
+            },
+            {
+              "path": ".gcloudignore",
+              "size": 370,
+              "type": "no-extension",
+              "category": "other"
+            },
+            {
+              "path": "frontend/tsconfig.node.json",
+              "size": 653,
+              "type": "json",
+              "category": "config"
+            },
+            {
+              "path": "frontend/index.html",
+              "size": 930,
+              "type": "html",
+              "category": "markup"
+            },
+            {
+              "path": "frontend/tsconfig.app.json",
+              "size": 732,
+              "type": "json",
+              "category": "config"
+            },
+            {
+              "path": "frontend/README.md",
+              "size": 2555,
+              "type": "md",
+              "category": "documentation"
+            },
+            {
+              "path": "frontend/.gitignore",
+              "size": 253,
+              "type": "no-extension",
+              "category": "other"
+            },
+            {
+              "path": "frontend/package-lock.json",
+              "size": 115715,
+              "type": "json",
+              "category": "config"
+            },
+            {
+              "path": "frontend/package.json",
+              "size": 743,
+              "type": "json",
+              "category": "config"
+            },
+            {
+              "path": "frontend/tsconfig.json",
+              "size": 119,
+              "type": "json",
+              "category": "config"
+            },
+            {
+              "path": "frontend/eslint.config.js",
+              "size": 616,
+              "type": "js",
+              "category": "source"
+            },
+            {
+              "path": "frontend/vite.config.ts",
+              "size": 484,
+              "type": "ts",
+              "category": "source"
+            },
+            {
+              "path": "frontend/src/App.tsx",
+              "size": 2073,
+              "type": "tsx",
+              "category": "source"
+            },
+            {
+              "path": "frontend/src/main.tsx",
+              "size": 230,
+              "type": "tsx",
+              "category": "source"
+            },
+            {
+              "path": "frontend/src/App.module.css",
+              "size": 1295,
+              "type": "css",
+              "category": "style"
+            },
+            {
+              "path": "frontend/src/index.css",
+              "size": 4879,
+              "type": "css",
+              "category": "style"
+            },
+            {
+              "path": "frontend/src/components/BootSequence.tsx",
+              "size": 3298,
+              "type": "tsx",
+              "category": "source"
+            },
+            {
+              "path": "frontend/src/components/AuditLog.module.css",
+              "size": 3914,
+              "type": "css",
+              "category": "style"
+            },
+            {
+              "path": "frontend/src/components/ChatPane.module.css",
+              "size": 15088,
+              "type": "css",
+              "category": "style"
+            },
+            {
+              "path": "frontend/src/components/ChatPane.tsx",
+              "size": 21904,
+              "type": "tsx",
+              "category": "source"
+            },
+            {
+              "path": "frontend/src/components/TerminalHeader.tsx",
+              "size": 1189,
+              "type": "tsx",
+              "category": "source"
+            },
+            {
+              "path": "frontend/src/components/AudioInput.tsx",
+              "size": 3949,
+              "type": "tsx",
+              "category": "source"
+            },
+            {
+              "path": "frontend/src/components/BootSequence.module.css",
+              "size": 2399,
+              "type": "css",
+              "category": "style"
+            },
+            {
+              "path": "frontend/src/components/AudioInput.module.css",
+              "size": 1242,
+              "type": "css",
+              "category": "style"
+            },
+            {
+              "path": "frontend/src/components/TerminalHeader.module.css",
+              "size": 2381,
+              "type": "css",
+              "category": "style"
+            },
+            {
+              "path": "frontend/src/components/AuditLog.tsx",
+              "size": 3980,
+              "type": "tsx",
+              "category": "source"
+            },
+            {
+              "path": "frontend/src/hooks/useScramble.ts",
+              "size": 2231,
+              "type": "ts",
+              "category": "source"
+            },
+            {
+              "path": "frontend/src/hooks/useAtlasAgent.ts",
+              "size": 6016,
+              "type": "ts",
+              "category": "source"
+            },
+            {
+              "path": "frontend/src/lib/socket.ts",
+              "size": 2421,
+              "type": "ts",
+              "category": "source"
+            },
+            {
+              "path": "tests/verify_law_models.py",
+              "size": 1355,
+              "type": "py",
+              "category": "source"
+            },
+            {
+              "path": "tests/test_governance_v2.py",
+              "size": 1840,
+              "type": "py",
+              "category": "source"
+            },
+            {
+              "path": "bugs/BUG-001.yaml",
+              "size": 1424,
+              "type": "yaml",
+              "category": "config"
+            },
+            {
+              "path": "bugs/README.md",
+              "size": 397,
+              "type": "md",
+              "category": "documentation"
+            },
+            {
+              "path": "backend/persistence.py",
+              "size": 2126,
+              "type": "py",
+              "category": "source"
+            },
+            {
+              "path": "backend/config.py",
+              "size": 2519,
+              "type": "py",
+              "category": "source"
+            },
+            {
+              "path": "backend/__init__.py",
+              "size": 107,
+              "type": "py",
+              "category": "source"
+            },
+            {
+              "path": "backend/leads.py",
+              "size": 1909,
+              "type": "py",
+              "category": "source"
+            },
+            {
+              "path": "backend/agent.py",
+              "size": 20703,
+              "type": "py",
+              "category": "source"
+            },
+            {
+              "path": "backend/notifications.py",
+              "size": 2103,
+              "type": "py",
+              "category": "source"
+            },
+            {
+              "path": "backend/main.py",
+              "size": 14783,
+              "type": "py",
+              "category": "source"
+            },
+            {
+              "path": "backend/mcp_server.py",
+              "size": 6638,
+              "type": "py",
+              "category": "source"
+            },
+            {
+              "path": "backend/governance.py",
+              "size": 19127,
+              "type": "py",
+              "category": "source"
+            },
+            {
+              "path": "backend/tools/verification.py",
+              "size": 9038,
+              "type": "py",
+              "category": "source"
+            },
+            {
+              "path": "backend/tools/__init__.py",
+              "size": 313,
+              "type": "py",
+              "category": "source"
+            },
+            {
+              "path": "backend/tools/resume_rag.py",
+              "size": 6606,
+              "type": "py",
+              "category": "source"
+            },
+            {
+              "path": "backend/tools/profile_extractor.py",
+              "size": 3404,
+              "type": "py",
+              "category": "source"
+            },
+            {
+              "path": "backend/tools/availability.py",
+              "size": 1830,
+              "type": "py",
+              "category": "source"
+            },
+            {
+              "path": "backend/tests/test_streaming_logic.py",
+              "size": 1372,
+              "type": "py",
+              "category": "source"
+            },
+            {
+              "path": "backend/tests/test_red_team.py",
+              "size": 2537,
+              "type": "py",
+              "category": "source"
+            },
+            {
+              "path": "backend/tests/test_streaming.py",
+              "size": 1701,
+              "type": "py",
+              "category": "source"
+            },
+            {
+              "path": "backend/tests/__init__.py",
+              "size": 41,
+              "type": "py",
+              "category": "source"
+            },
+            {
+              "path": "backend/tests/list_models.py",
+              "size": 575,
+              "type": "py",
+              "category": "source"
+            },
+            {
+              "path": "backend/tests/debug_gemini.py",
+              "size": 1026,
+              "type": "py",
+              "category": "source"
+            },
+            {
+              "path": "backend/tests/test_tools.py",
+              "size": 5361,
+              "type": "py",
+              "category": "source"
+            },
+            {
+              "path": "notes_archive/streaming_resolved_2026-01-28.md",
+              "size": 4186,
+              "type": "md",
+              "category": "markup"
+            },
+            {
+              "path": "anchor/2026-01-29T12-30-anchor.md",
+              "size": 1343,
+              "type": "md",
+              "category": "markup"
+            },
+            {
+              "path": "anchor/2026_01_28_11_23_59.md",
+              "size": 1142,
+              "type": "md",
+              "category": "markup"
+            },
+            {
+              "path": "anchor/2026-01-28T10-05-anchor.md",
+              "size": 933,
+              "type": "md",
+              "category": "markup"
+            },
+            {
+              "path": "data/resume.txt",
+              "size": 7070,
+              "type": "txt",
+              "category": "markup"
+            },
+            {
+              "path": "data/resume.template.txt",
+              "size": 2278,
+              "type": "txt",
+              "category": "markup"
+            },
+            {
+              "path": "data/availability.json",
+              "size": 331,
+              "type": "json",
+              "category": "config"
+            },
+            {
+              "path": "data/leads.json",
+              "size": 1494,
+              "type": "json",
+              "category": "config"
+            }
+          ],
+          "breakdown_by_type": {
+            "py": 23,
+            "json": 8,
+            "md": 8,
+            "tsx": 7,
+            "css": 7,
+            "no-extension": 4,
+            "ts": 4,
+            "txt": 2,
+            "toml": 1,
+            "html": 1,
+            "js": 1,
+            "yaml": 1
+          },
+          "breakdown_by_category": {
+            "source": 35,
+            "config": 10,
+            "markup": 8,
+            "style": 7,
+            "other": 4,
+            "documentation": 3
+          }
+        },
+        "conversion": {
+          "success": 67,
+          "failed": 0,
+          "total_size_original": 343717,
+          "total_size_pdf": 351730,
+          "errors": [],
+          "compression_ratio": 1.0233127834817597,
+          "success_rate": 100.0
+        },
+        "metrics": {
+          "original": {
+            "total_files": 67,
+            "total_size_bytes": 343717,
+            "estimated_tokens": 85901
+          },
+          "pdf": {
+            "total_files": 10,
+            "total_size_bytes": 351730,
+            "estimated_tokens": 1650,
+            "compression_ratio": 0.9772183208711227,
+            "token_compression_ratio": 52.06121212121212,
+            "token_savings": 84251,
+            "token_savings_percent": 98.07918417713414
+          },
+          "ocr": null,
+          "gemini_compatibility": {
+            "context_limit": 2000000,
+            "fits_pdf": true,
+            "fits_ocr": null,
+            "pdf_usage_percent": 0.0825,
+            "ocr_usage_percent": null
+          },
+          "summary": {
+            "best_format": "pdf",
+            "recommended_action": "PDF format is sufficient"
+          }
+        },
+        "smart_concatenation": {
+          "max_pdfs": 10,
+          "pdf_groups": [
+            {
+              "name": "tests.pdf",
+              "path": "tests.pdf",
+              "file_count": 2,
+              "size_bytes": 4975
+            },
+            {
+              "name": "frontend.pdf",
+              "path": "frontend.pdf",
+              "file_count": 10,
+              "size_bytes": 113764
+            },
+            {
+              "name": "frontend_src.pdf",
+              "path": "frontend_src.pdf",
+              "file_count": 16,
+              "size_bytes": 82217
+            },
+            {
+              "name": "backend.pdf",
+              "path": "backend.pdf",
+              "file_count": 9,
+              "size_bytes": 65487
+            },
+            {
+              "name": "backend_tools.pdf",
+              "path": "backend_tools.pdf",
+              "file_count": 5,
+              "size_bytes": 22702
+            },
+            {
+              "name": "backend_tests.pdf",
+              "path": "backend_tests.pdf",
+              "file_count": 7,
+              "size_bytes": 14507
+            },
+            {
+              "name": "frontend_src_lib.pdf",
+              "path": "frontend_src_lib.pdf",
+              "file_count": 1,
+              "size_bytes": 4632
+            },
+            {
+              "name": "data.pdf",
+              "path": "data.pdf",
+              "file_count": 4,
+              "size_bytes": 12596
+            },
+            {
+              "name": "anchor.pdf",
+              "path": "anchor.pdf",
+              "file_count": 3,
+              "size_bytes": 5761
+            },
+            {
+              "name": "misc.pdf",
+              "path": "misc.pdf",
+              "file_count": 10,
+              "size_bytes": 25089
+            }
+          ],
+          "total_pdfs_created": 10
+        },
+        "summary": {
+          "files_discovered": 67,
+          "files_converted": 67,
+          "files_failed": 0,
+          "files_already_processed": 0,
+          "total_size_original_bytes": 343717,
+          "total_size_pdf_bytes": 351730,
+          "compression_ratio": 1.0233127834817597,
+          "total_pdfs": 10
+        },
+        "failed_files": [],
+        "failure_report": null,
+        "telemetry_log": "/Users/johndoe/Projects/Atlas-G Protocol_ocr_ready/telemetry.log",
+        "ocr": {
+          "enabled": false,
+          "error": "OCR dependencies not available"
+        }
+      },
+      "estimates": {
+        "pre_compression": {
+          "total_tokens": 98787,
+          "file_tokens": {
+            "mcp_config.json": 800,
+            "Dockerfile": 538,
+            "pyproject.toml": 350,
+            "README.md": 1254,
+            ".gitignore": 181,
+            "NOTES.MD": 236,
+            ".gcloudignore": 112,
+            "frontend/tsconfig.node.json": 188,
+            "frontend/index.html": 249,
+            "frontend/tsconfig.app.json": 214,
+            "frontend/README.md": 610,
+            "frontend/.gitignore": 86,
+            "frontend/package-lock.json": 45657,
+            "frontend/package.json": 278,
+            "frontend/tsconfig.json": 38,
+            "frontend/eslint.config.js": 150,
+            "frontend/vite.config.ts": 133,
+            "frontend/src/App.tsx": 448,
+            "frontend/src/main.tsx": 58,
+            "frontend/src/App.module.css": 406,
+            "frontend/src/index.css": 1619,
+            "frontend/src/components/BootSequence.tsx": 848,
+            "frontend/src/components/AuditLog.module.css": 1250,
+            "frontend/src/components/ChatPane.module.css": 4615,
+            "frontend/src/components/ChatPane.tsx": 4750,
+            "frontend/src/components/TerminalHeader.tsx": 257,
+            "frontend/src/components/AudioInput.tsx": 865,
+            "frontend/src/components/BootSequence.module.css": 871,
+            "frontend/src/components/AudioInput.module.css": 407,
+            "frontend/src/components/TerminalHeader.module.css": 704,
+            "frontend/src/components/AuditLog.tsx": 911,
+            "frontend/src/hooks/useScramble.ts": 501,
+            "frontend/src/hooks/useAtlasAgent.ts": 1292,
+            "frontend/src/lib/socket.ts": 559,
+            "tests/verify_law_models.py": 303,
+            "tests/test_governance_v2.py": 415,
+            "bugs/BUG-001.yaml": 318,
+            "bugs/README.md": 133,
+            "backend/persistence.py": 404,
+            "backend/config.py": 558,
+            "backend/__init__.py": 28,
+            "backend/leads.py": 446,
+            "backend/agent.py": 4200,
+            "backend/notifications.py": 460,
+            "backend/main.py": 2932,
+            "backend/mcp_server.py": 1341,
+            "backend/governance.py": 4340,
+            "backend/tools/verification.py": 1886,
+            "backend/tools/__init__.py": 68,
+            "backend/tools/resume_rag.py": 1413,
+            "backend/tools/profile_extractor.py": 771,
+            "backend/tools/availability.py": 384,
+            "backend/tests/test_streaming_logic.py": 319,
+            "backend/tests/test_red_team.py": 556,
+            "backend/tests/test_streaming.py": 402,
+            "backend/tests/__init__.py": 9,
+            "backend/tests/list_models.py": 128,
+            "backend/tests/debug_gemini.py": 226,
+            "backend/tests/test_tools.py": 990,
+            "notes_archive/streaming_resolved_2026-01-28.md": 918,
+            "anchor/2026-01-29T12-30-anchor.md": 319,
+            "anchor/2026_01_28_11_23_59.md": 273,
+            "anchor/2026-01-28T10-05-anchor.md": 212,
+            "data/resume.txt": 1546,
+            "data/resume.template.txt": 432,
+            "data/availability.json": 103,
+            "data/leads.json": 519
+          },
+          "file_count": 67,
+          "files_with_errors": 0
+        },
+        "post_compression": {
+          "estimated_tokens": 10000,
+          "savings": 88787,
+          "savings_percent": 89.88,
+          "compression_ratio": 9.88,
+          "pre_tokens": 98787,
+          "has_valid_tokens": true
+        },
+        "recommendation": {
+          "recommended": true,
+          "severity": "success",
+          "message": "Significant compression benefits expected",
+          "action": "proceed",
+          "icon": "\u2705"
+        },
+        "deepseek_insights": {
+          "compression_ratio": 10,
+          "accuracy": 0.97,
+          "accuracy_percent": 97,
+          "estimated_pages": 134,
+          "processing_time_seconds": 0.67,
+          "processing_time_formatted": "0.7 seconds",
+          "throughput_capacity_percent": 0.07,
+          "throughput_pages_per_day": 200000,
+          "text_to_vision_token_ratio": 0.1,
+          "vision_tokens_estimate": 10000,
+          "pre_tokens": 98787,
+          "model_version": "DeepSeek-OCR v2.0"
+        }
+      }
     }
   },
-  "counter": 18
+  "counter": 19
 }
