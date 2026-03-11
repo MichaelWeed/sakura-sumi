@@ -6,7 +6,7 @@ import signal
 from pathlib import Path
 from typing import List, Optional, Dict, Any, Callable, Set
 from datetime import datetime
-from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor, as_completed
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from multiprocessing import cpu_count
 import time
 
@@ -16,7 +16,7 @@ except ImportError:
     tqdm = None
 
 from ..utils.file_discovery import FileDiscovery, FileInfo
-from ..utils.metrics import CompressionMetrics, create_visualizations
+from ..utils.metrics import CompressionMetrics
 from ..utils.telemetry import TelemetryLogger
 from .pdf_converter import PDFConverter
 
