@@ -1,6 +1,5 @@
 """Optional DeepSeek-OCR integration for advanced compression."""
 
-import json
 from pathlib import Path
 from typing import Optional, Dict, Any, List
 import warnings
@@ -218,13 +217,11 @@ class OCRCompressor:
         }
         
         try:
-            import vllm
             deps['vllm'] = True
         except ImportError:
             pass
         
         try:
-            import transformers
             deps['transformers'] = True
         except ImportError:
             pass
