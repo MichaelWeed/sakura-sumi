@@ -284,7 +284,12 @@ def estimate():
                     if Path(path).exists():
                         shutil.rmtree(path, ignore_errors=True)
         except Exception as e:
-            return jsonify({'error': str(e)}), 500
+            error_type = type(e).__name__
+            return jsonify({
+                'error': f'Prompt processing failed: {str(e)}',
+                'error_type': error_type,
+                'suggestion': 'Please ensure your prompts contain valid text. If the problem persists, try processing fewer prompts at once.'
+            }), 500
     
     # Handle directory estimation (existing code)
     if not source_dir:
@@ -307,18 +312,21 @@ def estimate():
         if not source_path.exists():
             return jsonify({
                 'error': f'Directory does not exist: {source_path}',
-                'provided': source_dir
+                'provided': source_dir,
+                'suggestion': 'Please verify the path is correct and the directory exists. Use an absolute path if needed.'
             }), 400
         if not source_path.is_dir():
             return jsonify({
                 'error': f'Path is not a directory: {source_path}',
-                'provided': source_dir
+                'provided': source_dir,
+                'suggestion': 'The specified path points to a file, not a directory. Please provide the directory containing your source code files.'
             }), 400
         source_dir = str(source_path)
     except Exception as e:
         return jsonify({
             'error': f'Invalid path: {str(e)}',
-            'provided': source_dir
+            'provided': source_dir,
+            'suggestion': 'Please check the path format and ensure it is valid. Use an absolute path if you encounter issues.'
         }), 400
     
     try:
@@ -345,7 +353,12 @@ def estimate():
             'technical_details': insights_service.get_technical_details(insights)
         })
     except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        error_type = type(e).__name__
+        return jsonify({
+            'error': f'Estimation failed: {str(e)}',
+            'error_type': error_type,
+            'suggestion': 'Please check that the directory contains supported source code files and try again. If the problem persists, check file permissions and disk space.'
+        }), 500
 
 
 @app.route('/api/compress', methods=['POST'])
@@ -374,15 +387,26 @@ def compress():
     max_pages_per_pdf = data.get('max_pages_per_pdf', 100)
     max_size_per_pdf_mb = data.get('max_size_per_pdf_mb', 10)
     max_total_pages = data.get('max_total_pages', 1000)
+    key_folders = data.get('key_folders', None)  # List of folder names or None
+    if key_folders and isinstance(key_folders, list):
+        key_folders = set(key_folders)  # Convert to set
+    elif key_folders:
+        key_folders = None  # Invalid format, use defaults
 
     cleanup_paths = []
     prompt_metadata = None
     is_prompt_mode = bool(prompt_payload)
     
     if is_prompt_mode and source_dir:
-        return jsonify({'error': 'Choose either a source directory or the prompt collector, not both.'}), 400
+        return jsonify({
+            'error': 'Choose either a source directory or the prompt collector, not both.',
+            'suggestion': 'Please select either a directory to compress OR use the Prompt Collector, but not both at the same time.'
+        }), 400
     if not source_dir and not is_prompt_mode:
-        return jsonify({'error': 'Source directory is required'}), 400
+        return jsonify({
+            'error': 'Source directory is required',
+            'suggestion': 'Please provide a source directory path or use the Prompt Collector to compress text prompts.'
+        }), 400
 
     if output_dir:
         output_dir = output_dir.strip().strip("'\"")
@@ -391,7 +415,10 @@ def compress():
         try:
             workspace, prompt_metadata = build_prompt_workspace(prompt_payload)
         except ValueError as exc:
-            return jsonify({'error': str(exc)}), 400
+            return jsonify({
+                'error': f'Invalid prompt data: {str(exc)}',
+                'suggestion': 'Please ensure your prompts contain valid text content. Each prompt should be a non-empty string.'
+            }), 400
         source_dir = str(workspace)
         exclusions = set()
         resume = False  # Resume does not apply to ephemeral prompt sessions
@@ -419,24 +446,34 @@ def compress():
             if not source_path.exists():
                 return jsonify({
                     'error': f'Directory does not exist: {source_path}',
-                    'provided': source_dir
+                    'provided': source_dir,
+                    'suggestion': 'Please verify the path is correct and the directory exists. Use an absolute path if needed.'
                 }), 400
             if not source_path.is_dir():
                 return jsonify({
                     'error': f'Path is not a directory: {source_path}',
-                    'provided': source_dir
+                    'provided': source_dir,
+                    'suggestion': 'The specified path points to a file, not a directory. Please provide the directory containing your source code files.'
                 }), 400
             source_dir = str(source_path)
             source_label = source_dir
         except Exception as e:
             return jsonify({
                 'error': f'Invalid path: {str(e)}',
-                'provided': source_dir
+                'provided': source_dir,
+                'suggestion': 'Please check the path format and ensure it is valid. Use an absolute path if you encounter issues.'
             }), 400
         
         # Set default output directory if not provided
         if not output_dir:
             output_dir = f"{source_dir}_ocr_ready"
+    
+    # Resolve output_dir to absolute path for all cases (needed for "Open Folder" functionality)
+    if output_dir:
+        try:
+            output_dir = str(Path(output_dir).expanduser().resolve())
+        except Exception:
+            pass  # Keep original if resolution fails
     
     # Calculate estimates before starting
     estimates = None
@@ -465,9 +502,9 @@ def compress():
     job_counter += 1
     job_id = f"job_{job_counter}_{int(datetime.now().timestamp())}"
     
-    # Sanitize paths for storage: use basename only to avoid exposing full directory structure
-    def sanitize_path_for_storage(path_str: str) -> str:
-        """Return basename of path to avoid exposing full directory structure."""
+    # Sanitize paths for display: use basename only to avoid exposing full directory structure
+    def sanitize_path_for_display(path_str: str) -> str:
+        """Return basename of path for display purposes."""
         if not path_str:
             return path_str
         return Path(path_str).name
@@ -475,9 +512,9 @@ def compress():
     job = {
         'id': job_id,
         'status': 'queued',
-        'source_dir': sanitize_path_for_storage(source_label),  # Sanitized: basename only
+        'source_dir': sanitize_path_for_display(source_label),  # Sanitized: basename only for display
         'mode': 'prompt' if is_prompt_mode else 'code',
-        'output_dir': sanitize_path_for_storage(output_dir) if output_dir else sanitize_path_for_storage(f"{source_dir}_ocr_ready"),  # Sanitized: basename only
+        'output_dir': output_dir,  # Full resolved path for operations (already resolved above)
         'created_at': datetime.now().isoformat(),
         'progress': 0,
         'message': 'Job queued',
@@ -492,7 +529,7 @@ def compress():
     # Start compression in background thread
     thread = threading.Thread(
         target=run_compression_job,
-        args=(job_id, source_dir, output_dir, parallel, workers, resume, ocr_enabled, ocr_mode, hybrid_mode, exclusions, smart_concatenation, max_pdfs, max_pages_per_pdf, max_size_per_pdf_mb, max_total_pages),  # HYBRID_MODE_START
+        args=(job_id, source_dir, output_dir, parallel, workers, resume, ocr_enabled, ocr_mode, hybrid_mode, exclusions, smart_concatenation, max_pdfs, max_pages_per_pdf, max_size_per_pdf_mb, max_total_pages, key_folders),  # HYBRID_MODE_START
         kwargs={'cleanup_paths': cleanup_paths or None},
         daemon=True
     )
@@ -505,7 +542,7 @@ def compress():
     })
 
 
-def run_compression_job(job_id, source_dir, output_dir, parallel, workers, resume, ocr_enabled, ocr_mode, hybrid_mode=False, exclusions=None, smart_concatenation=False, max_pdfs=10, max_pages_per_pdf=100, max_size_per_pdf_mb=10, max_total_pages=1000, cleanup_paths=None):  # HYBRID_MODE_START
+def run_compression_job(job_id, source_dir, output_dir, parallel, workers, resume, ocr_enabled, ocr_mode, hybrid_mode=False, exclusions=None, smart_concatenation=False, max_pdfs=10, max_pages_per_pdf=100, max_size_per_pdf_mb=10, max_total_pages=1000, key_folders=None, cleanup_paths=None):  # HYBRID_MODE_START
     """Run compression job in background."""
     try:
         jobs[job_id]['status'] = 'running'
@@ -541,6 +578,7 @@ def run_compression_job(job_id, source_dir, output_dir, parallel, workers, resum
                 max_pages_per_pdf=max_pages_per_pdf,
                 max_size_per_pdf_mb=max_size_per_pdf_mb,
                 max_total_pages=max_total_pages,
+                key_folders=key_folders,
                 verbose=False
             )
         else:

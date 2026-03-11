@@ -1,44 +1,20 @@
 # Usage Guide
 
-Complete guide for using the OCR Compression System.
+How to install and run the compressor (CLI and web).
 
-## Table of Contents
-
-1. [Installation](#installation)
-2. [Basic Usage](#basic-usage)
-3. [Advanced Features](#advanced-features)
-4. [Web Portal](#web-portal)
-5. [Configuration](#configuration)
-6. [Troubleshooting](#troubleshooting)
+**Contents:** [Installation](#installation) · [Basic usage](#basic-usage) · [Advanced](#advanced-features) · [Web portal](#web-portal) · [Configuration](#configuration) · [Troubleshooting](#troubleshooting)
 
 ## Installation
 
-### Prerequisites
-
-- Python 3.8 or higher
-- pip package manager
-- 500MB+ free disk space
-
-### Step-by-Step Installation
+You need Python 3.8+ and some free disk space. From the project directory:
 
 ```bash
-# 1. Navigate to project directory
-cd /path/to/OCR\ Compression
-
-# 2. Create virtual environment
 python3 -m venv venv
-
-# 3. Activate virtual environment
-source venv/bin/activate  # macOS/Linux
-# OR
-venv\Scripts\activate     # Windows
-
-# 4. Install dependencies
+source venv/bin/activate   # macOS/Linux; Windows: venv\Scripts\activate
 pip install -r requirements.txt
-
-# 5. Verify installation
-python compress.py --help
 ```
+
+Check it: `python scripts/compress.py --help`
 
 ## Basic Usage
 

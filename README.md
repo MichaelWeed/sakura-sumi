@@ -1,26 +1,14 @@
-# 🌸 Sakura Sumi - OCR Compression System
+# Sakura Sumi
 
+![Sakura Sumi](flag.jpg)
 
-![🌸Sakura Sumi](flag.jpg)
+🌸 Sakura Sumi - Visual Token Arbitrage Engine transforms raw source code into high-density visual tokens for LLM context maximization. Achieve 7–20x token compression, letting entire repositories fit comfortably inside a 2M-token context window with perfect retrieval.
 
-Convert your codebase to compressed PDFs for LLM analysis. Achieves 7-20x token compression, enabling large codebases to fit within Gemini's 2M token context window.
-
-## Features
-
-- **File Discovery**: Automatically discovers and categorizes source files
-- **Dense PDF Conversion**: Converts code to OCR-optimized PDFs with minimal margins
-- **Parallel Processing**: Process multiple files simultaneously
-- **Resume Capability**: Resume interrupted compressions from checkpoints
-- **Progress Tracking**: Real-time progress bars and status updates
-- **OCR Compression**: Optional DeepSeek-OCR integration for maximum compression (7-20x)
-- **Metrics & Reporting**: Token estimation, compression ratios, Gemini compatibility checks
-- **Web Portal**: Beautiful sakura-themed browser interface with cherry blossom aesthetics
-- **Prompt Collector**: Paste and compress long-form prompts without pointing to a directory
-- **Comprehensive Testing**: Unit and integration tests for reliability
+The engine discovers files, applies deterministic arbitrage algorithms to maximize information density, and generates vision-optimized PDFs. Features include multi-worker parallelization, a beautiful Sakura-themed Web UI, DeepSeek-OCR integration, and a dedicated "Prompt Collector" for text fragments. See [Arbitrage Methodology](#arbitrage-methodology) for technical details.
 
 ## File Type Support
 
-Sakura Sumi uses a **whitelist approach** - only text-based files with supported extensions are processed. This ensures reliable conversion and prevents crashes from binary files.
+Only text-based files with known extensions are processed. Everything else is skipped so we don’t blow up on binaries or random junk.
 
 ### Supported File Types
 
@@ -68,64 +56,38 @@ The system handles problematic files gracefully without crashing:
 - **Very large files**: Files >100MB may cause issues (see Troubleshooting section).
 - **Empty files**: Files with 0 bytes are automatically skipped.
 
-### Important Note
-
-**Sakura Sumi does NOT convert everything that's not in the exclusion list.** It only processes text files with supported extensions. This whitelist approach ensures:
-- Reliable conversion (no crashes from binary files)
-- Predictable behavior (only text-based source files)
-- Optimal compression (text files compress best)
-
-If you have a codebase with 72k files, only those with supported extensions (typically source code, config, and documentation files) will be converted. Binary files, images, and archives are automatically excluded.
+So: we only convert files that match the list above. If your repo has 72k files, we’ll only touch the ones that look like source, config, or docs. No images, no binaries, no archives.
 
 ## Quick Start
 
-### For Beginners
+You need Python (from [python.org](https://www.python.org/downloads/) if you don’t have it; check “Add Python to PATH” when installing). Then:
 
-**What is this?** Sakura Sumi converts your code files into compressed PDFs that you can upload to AI models like Google Gemini. This lets you analyze entire codebases that would normally be too large.
-
-**3-Step Setup:**
-
-1. **Install Python** (if you don't have it):
-   - Download from [python.org](https://www.python.org/downloads/)
-   - Make sure to check "Add Python to PATH" during installation
-
-2. **Get the code:**
-   ```bash
-   git clone https://github.com/yourusername/ocr-compression.git
-   cd ocr-compression
-   ```
-
-3. **Set up and run:**
-   ```bash
-   # Create a virtual environment (keeps dependencies organized)
-   python3 -m venv venv
-   
-   # Activate it
-   source venv/bin/activate  # On macOS/Linux
-   # OR: venv\Scripts\activate  # On Windows
-   
-   # Install required packages
-   pip install -r requirements.txt
-   
-   # Compress your codebase (replace with your actual path)
-   python scripts/compress.py "/path/to/your/codebase" -v
-   ```
-
-**That's it!** Your PDFs will be in `{your_codebase}_ocr_ready/`
-
-### For Experienced Developers
-
-**Installation:**
 ```bash
-git clone https://github.com/yourusername/ocr-compression.git
-cd ocr-compression
+git clone https://github.com/MichaelWeed/sakura-sumi.git
+cd sakura-sumi
+
 python3 -m venv venv
-source venv/bin/activate  # macOS/Linux
-# OR: venv\Scripts\activate  # Windows
+source venv/bin/activate   # macOS/Linux; on Windows: venv\Scripts\activate
 pip install -r requirements.txt
+
+python scripts/compress.py "/path/to/your/codebase" -v
 ```
 
-**Basic Usage:**
+PDFs show up in a folder named `{your_codebase}_ocr_ready/`.
+
+### Double-click launchers (install + web UI)
+
+No terminal needed. Double-click the right file for your OS; it will create a venv and install deps if needed, then open the web portal (and your browser).
+
+| OS      | File                     |
+|---------|--------------------------|
+| macOS   | `Sakura Sumi.command`    |
+| Windows | `Sakura Sumi.bat`        |
+| Linux   | `Sakura Sumi.sh`         |
+
+On Linux, make sure the script is executable (`chmod +x "Sakura Sumi.sh"`). To add it to your application menu, run `./install-linux-launcher.sh` once.
+
+**CLI usage:**
 ```bash
 # Simple compression
 python scripts/compress.py "/path/to/codebase" -v
@@ -143,14 +105,11 @@ python scripts/compress.py "/path/to/codebase" --generate-report markdown -v
 python scripts/compress.py "/path/to/codebase" --generate-charts -v
 ```
 
-**Advanced Options:**
-- See [CLI Options](#cli-options) for full parameter list
-- See [Compression Modes](#compression-modes) for OCR compression details
-- See [Project Structure](#project-structure) for codebase organization
+Full options are in [CLI Options](#cli-options). For OCR modes see [Compression Modes](#compression-modes).
 
-### Web Portal (Recommended for Beginners)
+### Web portal
 
-The web portal provides a user-friendly interface - perfect if you're not comfortable with command-line tools.
+If you’d rather not use the CLI:
 
 ```bash
 # Start the web server
@@ -159,19 +118,11 @@ python scripts/run_web.py
 # Open http://localhost:5001 in your browser
 ```
 
-**Features:**
-- Beautiful sakura (cherry blossom) themed interface
-- Point-and-click file selection
-- Real-time progress tracking
-- Token estimation before compression
-- Job history and results management
-- No command-line knowledge required
+You get a browser UI with folder picker, progress, token estimates, and job history. Same features as the CLI, just through the UI.
 
-**For Advanced Users:** The web portal exposes all CLI features through a GUI, including parallel processing, resume capability, and OCR compression modes.
+### Docker
 
-### Docker (Zero-Setup Option)
-
-Don't want to install Python locally? Use the provided Docker setup.
+No local Python? Use Docker.
 
 ```bash
 # Build the image
@@ -184,48 +135,15 @@ docker run --rm -p 5001:5001 \
   sakura-sumi
 ```
 
-Or use docker-compose for one-command startup:
+Or `docker compose up --build`. The compose setup mounts `./build` and `./output` so job history and results stick around. Override with `FLASK_SECRET_KEY` or `SAKURA_TELEMETRY` in `.env` if you need to.
 
-```bash
-docker compose up --build
-```
+In the web portal, the **Prompt Collector** lets you paste long text (prompts, docs, etc.) and compress it to PDF without pointing at a directory. Click the button, add prompts, then “Compress Prompts.”
 
-The compose file mounts `./build` (job history) and `./output` (compression results) so they persist on your host machine. Set `FLASK_SECRET_KEY` or `SAKURA_TELEMETRY` in your `.env` or shell to override the defaults.
+## Telemetry
 
-### Prompt Collector (Web Portal Feature)
+Diagnostic info (timing, file counts, errors, metrics) is written locally to `telemetry.log` in the output directory. Nothing is sent off-machine. JSONL, one object per line.
 
-**What it does:** Compress long-form text prompts without needing a directory structure.
-
-**How to use:**
-1. Click the **"Prompt Collector"** button in the web portal
-2. Click the **"+"** icon to add a new prompt
-3. Paste your text - it saves automatically
-4. Click **"Compress Prompts"** to generate PDFs
-
-**Use cases:**
-- Compressing long AI prompts for analysis
-- Converting documentation snippets to PDFs
-- Processing text that isn't in file format
-
-**For Developers:** The drawer uses `window.PromptCollectorStore` for state management, enabling future JSON export or LLM integration hooks.
-
-## Telemetry & Logging
-
-**What is telemetry?** Sakura Sumi logs diagnostic information to help you debug issues and understand compression performance. This is **local-only** - no data is sent anywhere.
-
-**What gets logged:**
-- Pipeline start/end times
-- Success/failure status
-- File counts and processing duration
-- Error messages and warnings
-- Compression metrics
-
-**Where it's stored:**
-- Logs are written to `telemetry.log` in your output directory
-- Example: If output is `/path/to/output`, logs are at `/path/to/output/telemetry.log`
-- Logs are in JSONL format (one JSON object per line) for easy parsing
-
-**How to disable:**
+To turn it off:
 ```bash
 # Disable telemetry logging
 export SAKURA_TELEMETRY=0
@@ -237,7 +155,6 @@ export SAKURA_TELEMETRY=false
 export SAKURA_TELEMETRY=off
 ```
 
-**For Developers:** Telemetry is enabled by default to help with debugging. The logger respects the `SAKURA_TELEMETRY` environment variable and never blocks the pipeline if logging fails.
 
 ## CLI Options
 
@@ -417,69 +334,34 @@ python scripts/compress.py "/path/to/codebase" \
 
 ## Troubleshooting
 
-### Common Issues
+**“No files found”** — The directory has no supported extensions. Use something that has `.py`, `.js`, `.ts`, etc. (see [File Type Support](#file-type-support)).
 
-**Problem: "No files found to process"**
-- **Cause**: Directory contains no supported file types
-- **Solution**: Check that your directory has source code files (`.py`, `.js`, `.ts`, etc.). See [File Type Support](#file-type-support) for full list.
+**No PDFs / weird failures** — Look at `failed_files.json` in the output folder and at `telemetry.log` for details. Permissions and encoding can trip things up; `ls -la` on the source dir is a quick check.
 
-**Problem: PDFs not generating**
-- **Cause**: File permissions or encoding issues
-- **Solution**: 
-  - Check file permissions: `ls -la /path/to/files`
-  - Check the `failed_files.json` in output directory for specific errors
-  - Review telemetry log for detailed error messages
+**Parallel runs failing** — Try `--workers 2` or drop `--parallel`.
 
-**Problem: Parallel processing errors**
-- **Cause**: Too many workers or system resource limits
-- **Solution**: 
-  - Reduce workers: `--workers 2`
-  - Or disable parallel mode: remove `--parallel` flag
+**OCR not available** — Optional. Install with `pip install vllm transformers` if you want it. Plain PDF compression doesn’t need it.
 
-**Problem: OCR compression not available**
-- **Cause**: Missing optional dependencies
-- **Solution**: Install OCR dependencies: `pip install vllm transformers`
-- **Note**: OCR compression is optional - regular PDF compression works without it
+**Out of memory** — Lower `--batch-size` and `--workers`, or run on a smaller subset of the tree.
 
-**Problem: Out of memory errors**
-- **Cause**: Processing too many files at once
-- **Solution**: 
-  - Reduce batch size: `--batch-size 5`
-  - Reduce workers: `--workers 2`
-  - Process in smaller chunks
+**Permission denied** — Fix read access on the source files; `failed_files.json` will list what failed.
 
-**Problem: "Permission denied" errors**
-- **Cause**: Cannot read source files
-- **Solution**: 
-  - Check file permissions: `chmod +r /path/to/files`
-  - Run with appropriate user permissions
-  - Check `failed_files.json` for specific files that failed
-
-**Still stuck?**
-- Check the telemetry log in your output directory
-- Review `failed_files.json` for specific file errors
-- Open an issue on GitHub with error details
+More: `docs/user/TROUBLESHOOTING.md`. Right-click / Quick Action issues: `docs/user/RIGHT_CLICK_COMPRESS.md`.
 
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
+## CI/CD Status
+
+![Tests](https://github.com/MichaelWeed/sakura-sumi/workflows/Tests/badge.svg)
+![Linting](https://github.com/MichaelWeed/sakura-sumi/workflows/Linting/badge.svg)
+
+---
+
 ## Contributing
 
-Contributions welcome! Please see `CONTRIBUTING.md` for:
-- Development setup instructions
-- Code style guidelines
-- Testing requirements
-- Pull request process
+See `CONTRIBUTING.md` for setup, style, and how to send a PR. Run the test suite before submitting. More for people hacking on the code: `docs/developer/DEVELOPER.md`.
 
-For detailed developer documentation, see `docs/developer/DEVELOPER.md`.
-
-Ensure tests pass before submitting PRs.
-
-## Support
-
-For issues and questions:
-- Check the documentation in `docs/`
-- Review existing bugs in `bugs/`
-- Open an issue on GitHub
+Bugs and questions: look in `docs/` and `bugs/`, or open an issue on GitHub.
 

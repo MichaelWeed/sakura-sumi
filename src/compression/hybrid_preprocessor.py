@@ -11,7 +11,7 @@ Trade-offs:
 """
 
 import re
-from typing import Dict, Tuple, Optional
+from typing import Dict, Tuple
 
 
 # HYBRID_MODE_START
