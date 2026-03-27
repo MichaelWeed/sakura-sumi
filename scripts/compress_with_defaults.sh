@@ -2,7 +2,7 @@
 # Convenience script to compress a directory with default settings
 # Used by macOS Automator workflows for right-click compression
 
-set -e  # Exit on error
+set -euo pipefail  # Exit on error, undefined vars, pipe failures
 
 # Create log directory and file for debugging
 LOG_DIR="$HOME/Library/Logs"

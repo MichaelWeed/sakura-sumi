@@ -35,3 +35,7 @@ htmlcov/
 telemetry.log
 sakura-sumi-web.log
 failed_files.json
+anchor/
+.sfdx/
+*_ocr_ready/
+!macOS/
