@@ -8,4 +8,4 @@
 
 **Design** (`design/`) — UI and design notes.
 
-Project management stuff (CANON, NOTES, WORKING, bugs) lives in `.meta/`.
+Issues and roadmap live on GitHub.

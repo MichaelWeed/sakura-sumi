@@ -50,6 +50,7 @@ def load_jobs():
 def save_jobs():
     """Save jobs to persistent storage."""
     try:
+        JOBS_FILE.parent.mkdir(parents=True, exist_ok=True)
         with open(JOBS_FILE, 'w') as f:
             json.dump({
                 'jobs': jobs,

@@ -35,3 +35,18 @@ htmlcov/
 telemetry.log
 sakura-sumi-web.log
 failed_files.json
+anchor/
+.sfdx/
+*_ocr_ready/
+!macOS/
+
+# Local project-management metadata (never publish)
+.meta/
+bugs/
+archive/
+NOTES.MD
+notes.yaml
+REORGANIZATION.md
+OPEN_SOURCE_CHECKLIST.md
+build/test_output/
+jobs.json

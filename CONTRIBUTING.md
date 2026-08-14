@@ -13,7 +13,7 @@ Code: PEP 8, type hints where it helps, docstrings on public APIs. Keep function
 
 Tests: add them for new behavior, run with `pytest tests/`. Coverage: `pytest --cov=src tests/`. Everything should pass before you open a PR.
 
-Bugs: we use the `bugs/` dir with `BUG-XXX.yaml` files. Use the template there; include steps, expected vs actual, and your environment.
+Bugs: open a GitHub Issue using the bug template; include steps, expected vs actual, and your environment.
 
 PRs: branch from `main`, make your change, run tests, update docs if needed, then open a PR with a clear description. Mention bug IDs if it fixes one.
 

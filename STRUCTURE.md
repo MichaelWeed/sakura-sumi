@@ -37,11 +37,9 @@ Documentation organized by audience:
 - `api/` - API reference documentation
 - `design/` - Design system and UI documentation
 
-### Project Management (`bugs/`, `archive/`)
+### Project Management
 Project management files:
-- `bugs/` - Bug tracking YAML files (BUG-XXX.yaml format)
-- `archive/` - Historical records and completed items
-- `notes.yaml` - Canonical project notes (gitignored)
+- Issues, roadmap, and release notes are tracked on GitHub.
 
 ### Tests (`tests/`)
 Test suite mirroring source structure:

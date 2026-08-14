@@ -59,8 +59,7 @@ OCR Compression/
 ├── tests/                # Test suite
 ├── docs/                 # Documentation
 ├── configs/              # Configuration presets
-├── bugs/                  # Bug tracking (YAML format)
-└── archive/              # Historical records
+└── config/               # Configuration presets
 ```
 
 ## 🎨 UI Theme: Sakura Design
@@ -125,26 +124,24 @@ pytest --cov=src --cov-report=html tests/
 
 ## 🐛 Bug Tracking
 
-Bugs are tracked in YAML format in the `bugs/` directory:
+Bugs are tracked as GitHub Issues:
 
-- Format: `BUG-XXX.yaml` where XXX is zero-padded 3-digit number
-- See `bugs/README.md` for bug tracking schema
-- Always update `bugs/README.md` statistics when creating/resolving bugs
+- Open one at https://github.com/MichaelWeed/sakura-sumi/issues
+- Use the issue template; include steps, expected vs actual, and your environment
+- Label with `bug`, and link the PR that fixes it
 
-### Creating a Bug
+### Reporting a Bug
 
-1. Check `bugs/` directory for highest BUG-XXX number
-2. Create `BUG-XXX.yaml` with required fields
-3. Update `bugs/README.md` statistics
-4. Set status to `open` or `in-progress`
+1. Search existing issues first to avoid duplicates
+2. Open a new issue using the bug template
+3. Include a minimal reproduction and your Python/OS versions
 
 ## 📚 Documentation Structure
 
 ### Core Documentation
 - **README.md**: Quick start and overview
 - **DEVELOPER.md**: This file - developer guide
-- **NOTES.MD**: High-level project overview
-- **CANON.md**: Immutable project rules
+- **STRUCTURE.md**: Repository layout
 
 ### Detailed Documentation
 - **docs/USAGE_GUIDE.md**: Complete usage guide
@@ -203,7 +200,6 @@ Bugs are tracked in YAML format in the `bugs/` directory:
 
 1. Identify correct file (see Documentation Structure above)
 2. Update content
-3. Update `notes.yaml` if adding new file
 4. Commit with descriptive message
 
 ## 🚨 Important Notes
@@ -239,7 +235,7 @@ The sakura theme is implemented with:
 ## 📞 Getting Help
 
 - **Documentation**: Check `docs/` directory
-- **Bugs**: See `bugs/README.md` for tracking
+- **Bugs**: Open a GitHub Issue
 - **Design Questions**: See `PROJECT_DESIGN_RULEBOOK.md`
 - **API Questions**: See `docs/API.md`
 
