@@ -223,8 +223,6 @@ OCR Compression/
 │   ├── developer/         # Developer documentation
 │   ├── api/              # API documentation
 │   └── design/           # Design documentation
-├── bugs/                 # Bug tracking (BUG-XXX.yaml format)
-├── archive/              # Historical records and completed items
 ├── build/                # Build artifacts (gitignored)
 ├── dist/                 # Distribution packages (gitignored)
 ├── setup.py              # Package setup configuration
@@ -363,5 +361,5 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 See `CONTRIBUTING.md` for setup, style, and how to send a PR. Run the test suite before submitting. More for people hacking on the code: `docs/developer/DEVELOPER.md`.
 
-Bugs and questions: look in `docs/` and `bugs/`, or open an issue on GitHub.
+Bugs and questions: look in `docs/`, or open an issue on GitHub.
 

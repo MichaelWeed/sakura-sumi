@@ -351,7 +351,7 @@ python test_pdf_generation.py
 
 - **API Reference**: `docs/api/API.md`
 - **Developer Guide**: `docs/developer/DEVELOPER.md`
-- **Bug Tracking**: `bugs/README.md` (BUG-005: XML escaping fix)
+- **Bug Tracking**: GitHub Issues
 
 ---
 
