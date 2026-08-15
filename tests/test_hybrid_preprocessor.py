@@ -58,5 +58,3 @@ def test_prepend_dict_adds_frontmatter():
     combined = prepend_dict(content, translation_dict)
     assert combined.startswith("---")
     assert combined.endswith("body")
-
-

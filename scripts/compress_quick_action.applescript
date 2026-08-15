@@ -12,7 +12,15 @@ on run {input, parameters}
 		-- Get the script directory
 		set scriptPath to POSIX path of (path to me)
 		set scriptDir to do shell script "dirname " & quoted form of scriptPath
-		set projectRoot to do shell script "dirname " & quoted form of scriptDir
+		if scriptDir contains "/Library/Services" then
+			-- Running as a Service: resolve the project relative to the
+			-- home folder rather than a hardcoded absolute path.
+			set homePath to POSIX path of (path to home folder)
+			set projectRoot to homePath & "Projects/Sakura Sumi"
+		else
+			-- Likely running from within the project folder
+			set projectRoot to do shell script "dirname " & quoted form of scriptDir
+		end if
 		
 		-- Build the full command
 		set compressScript to quoted form of (projectRoot & "/scripts/compress_with_defaults.sh")

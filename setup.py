@@ -28,7 +28,7 @@ setup(
     url='https://github.com/yourusername/ocr-compression',
     packages=find_packages(where='src'),
     package_dir={'': 'src'},
-    python_requires='>=3.8',
+    python_requires='>=3.9',
     install_requires=requirements,
     entry_points={
         'console_scripts': [
@@ -41,10 +41,10 @@ setup(
         'Intended Audience :: Developers',
         'License :: OSI Approved :: MIT License',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: 3.9',
         'Programming Language :: Python :: 3.10',
         'Programming Language :: Python :: 3.11',
+        'Programming Language :: Python :: 3.12',
         'Topic :: Software Development :: Libraries :: Python Modules',
     ],
     include_package_data=True,

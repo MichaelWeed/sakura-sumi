@@ -5,10 +5,9 @@ from .token_estimation import TokenEstimationService, get_compression_recommenda
 from .deepseek_insights import DeepSeekInsightsService
 
 __all__ = [
-    'FileDiscovery',
-    'FileInfo',
-    'TokenEstimationService',
-    'get_compression_recommendation',
-    'DeepSeekInsightsService',
+    "FileDiscovery",
+    "FileInfo",
+    "TokenEstimationService",
+    "get_compression_recommendation",
+    "DeepSeekInsightsService",
 ]
-
