@@ -1,0 +1,16 @@
+# Ruff configuration.
+#
+# Both the rule set and the target version are pinned explicitly. Without this
+# file ruff falls back to whatever its current defaults are, so a new ruff
+# release can fail CI on unchanged code.
+
+target-version = "py39"
+line-length = 88
+
+[lint]
+# Ruff's documented default rule set, stated explicitly so it does not move.
+select = ["E4", "E7", "E9", "F"]
+
+[lint.per-file-ignores]
+# Test files intentionally re-import and shadow names for fixtures.
+"tests/*" = ["F811"]
