@@ -8,7 +8,7 @@ import platform
 import re
 import shutil
 from pathlib import Path
-from flask import Flask, render_template, request, jsonify, send_file
+from flask import Flask, render_template, request, jsonify, Response
 import zipfile
 import tempfile
 from datetime import datetime
@@ -891,13 +891,36 @@ def download_results(job_id):
                     arcname = file_path.relative_to(output_dir)
                     zipf.write(file_path, arcname)
 
-        return send_file(
-            temp_zip_path,
+        # Stream the archive and delete it once the body has been sent.
+        # Previously the temp file was handed to send_file and never
+        # removed, so every download leaked a ZIP into the temp directory
+        # and, on Windows, the open handle blocked deletion entirely.
+        def stream_and_cleanup():
+            try:
+                with open(temp_zip_path, "rb") as fh:
+                    while True:
+                        chunk = fh.read(64 * 1024)
+                        if not chunk:
+                            break
+                        yield chunk
+            finally:
+                try:
+                    Path(temp_zip_path).unlink()
+                except OSError:
+                    pass
+
+        return Response(
+            stream_and_cleanup(),
             mimetype="application/zip",
-            as_attachment=True,
-            download_name=f"compression_results_{job_id}.zip",
+            headers={
+                "Content-Disposition": (
+                    f'attachment; filename="compression_results_{job_id}.zip"'
+                ),
+                "Content-Length": str(Path(temp_zip_path).stat().st_size),
+            },
         )
     except Exception as e:
+        Path(temp_zip_path).unlink(missing_ok=True)
         return jsonify({"error": f"Failed to create ZIP: {str(e)}"}), 500
 
 

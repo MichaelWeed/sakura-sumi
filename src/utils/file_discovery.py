@@ -160,7 +160,9 @@ class FileDiscovery:
         # Get relative path string for pattern matching
         try:
             relative_path = path.relative_to(self.source_dir)
-            relative_str = str(relative_path)
+            # Exclusion patterns are written with forward slashes, so normalise
+            # here rather than matching against native separators.
+            relative_str = relative_path.as_posix()
             path_str = str(path)
         except ValueError:
             # Path is outside source_dir, use absolute path
@@ -290,7 +292,9 @@ class FileDiscovery:
                     relative_path = file_path.relative_to(self.source_dir)
                     file_info = FileInfo(
                         path=str(file_path),
-                        relative_path=str(relative_path),
+                        # Always forward slashes: this string ends up in
+                        # manifests, PDF headers and directory-tree keys.
+                        relative_path=relative_path.as_posix(),
                         size=size,
                         file_type=self._get_file_type(file_path),
                         category=self._categorize_file(file_path),

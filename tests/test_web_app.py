@@ -291,8 +291,13 @@ def test_download_results_endpoint(client, monkeypatch, tmp_path):
 
     resp = client.get(f"/api/download/{job_id}")
     assert resp.status_code == 200
-    assert temp_zip_path.exists()
-    temp_zip_path.unlink()  # cleanup
+    assert resp.mimetype == "application/zip"
+    assert resp.data  # archive was streamed back to the caller
+    resp.close()
+
+    # The endpoint removes its temporary archive once the response closes,
+    # rather than leaving one behind on every download.
+    assert not temp_zip_path.exists()
 
 
 def test_ocr_modes_endpoint(client):

@@ -74,8 +74,9 @@ class SmartConcatenationEngine:
             # Get directory path (parent of file)
             file_path = Path(file_info.relative_path)
             if len(file_path.parts) > 1:
-                # File is in a subdirectory
-                dir_path = str(file_path.parent)
+                # File is in a subdirectory. Keys must use forward slashes:
+                # the depth and rollup logic below splits them on "/".
+                dir_path = file_path.parent.as_posix()
                 tree[dir_path].append(file_info)
             else:
                 # File is at root
