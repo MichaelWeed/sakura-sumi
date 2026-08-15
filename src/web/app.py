@@ -73,25 +73,25 @@ def is_safe_path(path_str: str) -> bool:
         # Expand user and resolve absolute path
         path = Path(path_str).expanduser().resolve()
 
-        # Check if path is system root
-        if path == Path("/"):
+        # Filesystem root: POSIX "/" or a Windows drive root ("C:\\"). A root
+        # is its own parent, which holds on every platform without needing
+        # to hardcode a separator style.
+        if path.parent == path:
             return False
 
-        # Prevent accessing system root, Users root, etc.
-        restricted_parents = [
-            Path("/Users"),
-            Path("/System"),
-            Path("/Library"),
-            Path("/"),
-        ]
-        if path in restricted_parents:
+        # The user's own home directory, or a direct sibling of it (i.e. any
+        # other account's home directory on the same machine: /Users/<name>,
+        # /home/<name>, C:\Users\<name>). Derived from Path.home() rather
+        # than a hardcoded "/Users" so it holds on Linux and Windows too.
+        users_root = Path.home().parent
+        if path == Path.home() or path.parent == users_root:
             return False
 
-        if path.parent in restricted_parents:
-            # Any direct child of /Users is somebody's home directory. Detect
-            # that structurally rather than matching a list of usernames.
-            if path.parent == Path("/Users") or path == Path.home():
+        # macOS system directories, meaningless (and harmless) elsewhere.
+        if platform.system() == "Darwin":
+            if path in (Path("/System"), Path("/Library")):
                 return False
+
         return True
     except Exception:
         return False

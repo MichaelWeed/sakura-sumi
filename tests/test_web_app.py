@@ -366,35 +366,46 @@ def test_browse_directory_cancellation(client, monkeypatch):
     assert response.status_code == 400
 
 
-def test_is_safe_path_helper():
-    """Verify that is_safe_path correctly flags dangerous paths."""
+def test_is_safe_path_helper(tmp_path):
+    """Verify that is_safe_path correctly flags dangerous paths.
+
+    Restricted examples are derived from Path.home() rather than hardcoded
+    POSIX strings like "/Users", so the assertions hold on Linux and
+    Windows runners as well as macOS.
+    """
+    from pathlib import Path
     from src.web.app import is_safe_path
 
-    assert not is_safe_path("/")
-    assert not is_safe_path("/System")
-    assert not is_safe_path("/Library")
-    assert not is_safe_path("/Users")
-    assert not is_safe_path("/Users/some-user")
-    assert not is_safe_path("/Users/root")
+    home = Path.home()
+    filesystem_root = str(Path(home.anchor))
+    another_users_home = str(home.parent / "some-other-user")
+
+    assert not is_safe_path(filesystem_root)
+    assert not is_safe_path(str(home))
+    assert not is_safe_path(another_users_home)
 
     # Safe paths should pass
-    assert is_safe_path("/Users/some-user/Projects/Sakura Sumi")
-    assert is_safe_path("/tmp/some_temp_project")
+    assert is_safe_path(str(home / "Projects" / "Sakura Sumi"))
+    assert is_safe_path(str(tmp_path / "some_temp_project"))
 
 
 def test_restricted_paths_in_endpoints(client):
     """Endpoints should reject restricted paths with 400 Bad Request."""
+    from pathlib import Path
+
+    restricted = str(Path.home())
+
     # Test /api/estimate
-    response = client.post("/api/estimate", json={"source_dir": "/System"})
+    response = client.post("/api/estimate", json={"source_dir": restricted})
     assert response.status_code == 400
     assert "restricted" in response.get_json()["error"].lower()
 
     # Test /api/open-folder
-    response = client.post("/api/open-folder", json={"path": "/System"})
+    response = client.post("/api/open-folder", json={"path": restricted})
     assert response.status_code == 400
     assert "restricted" in response.get_json()["error"].lower()
 
     # Test /api/compress
-    response = client.post("/api/compress", json={"source_dir": "/System"})
+    response = client.post("/api/compress", json={"source_dir": restricted})
     assert response.status_code == 400
     assert "restricted" in response.get_json()["error"].lower()
