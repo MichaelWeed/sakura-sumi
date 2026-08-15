@@ -13,8 +13,10 @@ on run {input, parameters}
 		set scriptPath to POSIX path of (path to me)
 		set scriptDir to do shell script "dirname " & quoted form of scriptPath
 		if scriptDir contains "/Library/Services" then
-			-- Running as a Service, use the hardcoded project path as fallback
-			set projectRoot to "/path/to/home/Projects/Sakura Sumi"
+			-- Running as a Service: resolve the project relative to the
+			-- home folder rather than a hardcoded absolute path.
+			set homePath to POSIX path of (path to home folder)
+			set projectRoot to homePath & "Projects/Sakura Sumi"
 		else
 			-- Likely running from within the project folder
 			set projectRoot to do shell script "dirname " & quoted form of scriptDir

@@ -13,7 +13,7 @@ No Automator setup. It just works.
 If you live in the terminal, add this to `~/.zshrc`:
 
 ```bash
-alias compress-code='bash /path/to/home/Projects/Sakura\ Sumi/scripts/compress_quick_action.sh'
+alias compress-code='bash $HOME/Projects/Sakura\ Sumi/scripts/compress_quick_action.sh'
 ```
 
 Reload your config (`source ~/.zshrc`) and then run:
@@ -32,7 +32,7 @@ Quick Actions can be flaky. If you want to try anyway:
 4. In the script box, put exactly:
 
 ```bash
-/path/to/home/Projects/Sakura\ Sumi/scripts/compress_quick_action.sh "$@"
+$HOME/Projects/Sakura\ Sumi/scripts/compress_quick_action.sh "$@"
 ```
 
 5. Save as something like "Compress with Sakura Sumi".

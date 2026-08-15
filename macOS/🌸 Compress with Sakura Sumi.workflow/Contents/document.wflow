@@ -59,7 +59,7 @@
 				<key>ActionParameters</key>
 				<dict>
 					<key>COMMAND_STRING</key>
-					<string>"/path/to/home/Projects/Sakura Sumi/scripts/compress_quick_action.sh" "$@"</string>
+					<string>"$HOME/Projects/Sakura Sumi/scripts/compress_quick_action.sh" "$@"</string>
 					<key>CheckedForUserDefaultShell</key>
 					<true/>
 					<key>inputMethod</key>
