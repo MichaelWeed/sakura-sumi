@@ -65,6 +65,88 @@ def save_jobs():
 load_jobs()
 
 
+def is_safe_path(path_str: str) -> bool:
+    """Validate that the path is not a critical system folder or home root."""
+    if not path_str:
+        return False
+    try:
+        # Expand user and resolve absolute path
+        path = Path(path_str).expanduser().resolve()
+
+        # Check if path is system root
+        if path == Path("/"):
+            return False
+
+        # Prevent accessing system root, Users root, etc.
+        restricted_parents = [
+            Path("/Users"),
+            Path("/System"),
+            Path("/Library"),
+            Path("/"),
+        ]
+        if path in restricted_parents:
+            return False
+
+        if path.parent in restricted_parents:
+            # Any direct child of /Users is somebody's home directory. Detect
+            # that structurally rather than matching a list of usernames.
+            if path.parent == Path("/Users") or path == Path.home():
+                return False
+        return True
+    except Exception:
+        return False
+
+
+@app.before_request
+def csrf_protect():
+    """
+    Protect state-changing POST requests against CSRF.
+    Validates that the Origin or Referer header matches the application's host.
+    """
+    if app.testing:
+        return
+
+    if request.method == "POST":
+        origin = request.headers.get("Origin")
+        referer = request.headers.get("Referer")
+
+        # Determine allowed host URL dynamically based on the current request
+        host_url = request.host_url.rstrip("/")
+
+        # If Origin is present, check that it matches host_url
+        if origin:
+            if origin.rstrip("/") != host_url:
+                return (
+                    jsonify(
+                        {
+                            "error": "Security validation failed: Request Origin not allowed"
+                        }
+                    ),
+                    403,
+                )
+        # If Origin is missing, fall back to Referer check
+        elif referer:
+            if not referer.startswith(host_url):
+                return (
+                    jsonify(
+                        {
+                            "error": "Security validation failed: Request Referer not allowed"
+                        }
+                    ),
+                    403,
+                )
+        else:
+            # If both are missing, reject standard cross-site requests to be safe
+            return (
+                jsonify(
+                    {
+                        "error": "Security validation failed: Origin or Referer header required for POST requests"
+                    }
+                ),
+                403,
+            )
+
+
 def create_app():
     """Create and configure Flask app."""
     return app
@@ -219,6 +301,17 @@ def open_folder():
     if not folder_path:
         return jsonify({"error": "Path is required"}), 400
 
+    if not is_safe_path(folder_path):
+        return (
+            jsonify(
+                {
+                    "error": f"Invalid or restricted folder path: {folder_path}",
+                    "suggestion": "Paths in home directory, system directory, or root are restricted for safety.",
+                }
+            ),
+            400,
+        )
+
     try:
         folder_path = Path(folder_path).expanduser().resolve()
 
@@ -332,6 +425,17 @@ def estimate():
 
     # Strip quotes and whitespace
     source_dir = source_dir.strip().strip("'\"")
+
+    if not is_safe_path(source_dir):
+        return (
+            jsonify(
+                {
+                    "error": f"Invalid or restricted source directory: {source_dir}",
+                    "suggestion": "Paths in home directory, system directory, or root are restricted for safety.",
+                }
+            ),
+            400,
+        )
 
     # Parse exclusions
     exclusions = set()
@@ -512,6 +616,17 @@ def compress():
         # Strip quotes and whitespace
         source_dir = source_dir.strip().strip("'\"")
 
+        if not is_safe_path(source_dir):
+            return (
+                jsonify(
+                    {
+                        "error": f"Invalid or restricted source directory: {source_dir}",
+                        "suggestion": "Paths in home directory, system directory, or root are restricted for safety.",
+                    }
+                ),
+                400,
+            )
+
         # Parse exclusions
         exclusions = set()
         if exclusions_text:
@@ -569,6 +684,17 @@ def compress():
             output_dir = str(Path(output_dir).expanduser().resolve())
         except Exception:
             pass  # Keep original if resolution fails
+
+        if not is_safe_path(output_dir):
+            return (
+                jsonify(
+                    {
+                        "error": f"Invalid or restricted output directory: {output_dir}",
+                        "suggestion": "Paths in home directory, system directory, or root are restricted for safety.",
+                    }
+                ),
+                400,
+            )
 
     # Calculate estimates before starting
     estimates = None
@@ -940,4 +1066,7 @@ def get_ocr_modes():
 
 
 if __name__ == "__main__":
-    app.run(debug=True, host="0.0.0.0", port=5000)
+    # Default to local binding and debug disabled unless overridden by env variables
+    debug_mode = os.environ.get("FLASK_DEBUG", "False").lower() in ("true", "1")
+    host_ip = os.environ.get("FLASK_HOST", "127.0.0.1")
+    app.run(debug=debug_mode, host=host_ip, port=5000)

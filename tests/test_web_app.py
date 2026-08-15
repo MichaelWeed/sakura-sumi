@@ -364,3 +364,37 @@ def test_browse_directory_cancellation(client, monkeypatch):
 
     response = client.post("/api/browse-directory")
     assert response.status_code == 400
+
+
+def test_is_safe_path_helper():
+    """Verify that is_safe_path correctly flags dangerous paths."""
+    from src.web.app import is_safe_path
+
+    assert not is_safe_path("/")
+    assert not is_safe_path("/System")
+    assert not is_safe_path("/Library")
+    assert not is_safe_path("/Users")
+    assert not is_safe_path("/Users/some-user")
+    assert not is_safe_path("/Users/root")
+
+    # Safe paths should pass
+    assert is_safe_path("/Users/some-user/Projects/Sakura Sumi")
+    assert is_safe_path("/tmp/some_temp_project")
+
+
+def test_restricted_paths_in_endpoints(client):
+    """Endpoints should reject restricted paths with 400 Bad Request."""
+    # Test /api/estimate
+    response = client.post("/api/estimate", json={"source_dir": "/System"})
+    assert response.status_code == 400
+    assert "restricted" in response.get_json()["error"].lower()
+
+    # Test /api/open-folder
+    response = client.post("/api/open-folder", json={"path": "/System"})
+    assert response.status_code == 400
+    assert "restricted" in response.get_json()["error"].lower()
+
+    # Test /api/compress
+    response = client.post("/api/compress", json={"source_dir": "/System"})
+    assert response.status_code == 400
+    assert "restricted" in response.get_json()["error"].lower()
